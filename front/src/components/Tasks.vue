@@ -1,57 +1,34 @@
 <script>
 export default {
-}
+  props: {
+    tasks: {
+      type: Array,
+      required: true,
+      default: () => [], // Значение по умолчанию - пустой массив
+    },
+  },
+};
 </script>
 
 <template>
-    <div class="tasks">
-      <p class="title-secondary">Список задач:</p>
-      <div class="tasks__list">
+  <div class="tasks">
+    <p class="title-secondary">Список задач:</p>
+    <div class="tasks__list">
+      <div v-for="task in tasks" :key="task.id" class="task">
+        <p class="task__description">
+          {{ task.task_description }}
+        </p>
 
-        <div class="task">
-          <p class="task__description">
-            Описание задачи, что сделал тут скорее всего не будет много текста
-          </p>
-
-          <div class = "task__extra">
-            <p class="task__project">проект задачи</p>
-            <p class="task__time">12.07.2025 (2 дн назад)</p>  
-          </div>
-
-          <div class="task__actions">
-            <button class="btn btn-accent task__edit">Edit</button>
-          </div>
+        <div class="task__extra">
+          <!-- <p class="task__project">{{ getProject Name(task.project_id) }}</p> -->
+          <p class="task__project">{{ task.project_id }}</p>
+          <p class="task__time">{{ task.completed_date }}</p>
         </div>
 
-        <div class="task">
-          <p class="task__description">
-            Описание задачи, что сделал тут скорее всего не будет много текста Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatum tempora illum molestias obcaecati iure dolor ipsum vitae numquam ad saepe!
-          </p>
-
-          <div class = "task__extra">
-            <p class="task__project">проект задачи</p>
-            <p class="task__time">12.07.2025 (3 дн назад)</p>  
-          </div>
-
-          <div class="task__actions">
-            <button class="btn btn-accent task__edit">Edit</button>
-          </div>
+        <div class="task__actions">
+          <button class="btn btn-accent task__edit">Edit</button>
         </div>
-        <div class="task">
-          <p class="task__description">
-            Описание задачи, что сделал тут скорее всего не будет много текста
-          </p>
-
-          <div class = "task__extra">
-            <p class="task__project">проект задачи</p>
-            <p class="task__time">12.07.2025 (1 дн назад)</p>  
-          </div>
-
-          <div class="task__actions">
-            <button class="btn btn-accent task__edit">Edit</button>
-          </div>
-        </div>
-
       </div>
     </div>
+  </div>
 </template>

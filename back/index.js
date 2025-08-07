@@ -8,6 +8,7 @@ const User = require("./models/User");
 const { getUsers } = require("./controllers/userController");
 const { login } = require("./controllers/authController");
 const {addTask} = require('./controllers/taskController');
+const { getInfo, getTasks } = require("./controllers/infoController");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -15,8 +16,8 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-app.get("/get-info", authMiddleware , getUsers);
-app.get("/get-info", getUsers);
+app.get("/get-info", authMiddleware , getInfo);
+app.get("/get-tasks", authMiddleware, getTasks);
 app.get("/get-info2", async (req, res) => {
   // В этом блоке можно обработать запрос и отправить ответ
   res.send({ message: "Это ответ на GET-запрос get-info2" });

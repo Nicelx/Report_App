@@ -7,34 +7,8 @@ export default {
     };
   },
   methods: {
-    async getInfo() {
-      const response = await fetch("http://localhost:3000/get-info"); // делаем GET-запрос
-
-      const data = await response.json(); // предполагается, что сервер возвращает JSON
-      console.log(data);
-    },
-    async getInfo2() {
-      const response = await fetch("http://localhost:3000/get-info2"); // делаем GET-запрос
-
-      const data = await response.json(); // предполагается, что сервер возвращает JSON
-      console.log(data);
-    },
     async createUser() {
       const response = await fetch("http://localhost:3000/create-user", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: this.username,
-          password: this.password,
-        }),
-      });
-    },
-
-    async login() {
-      // console.log(this.username, this.password)
-      const response = await fetch("http://localhost:3000/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -73,6 +47,7 @@ export default {
   }
   .nav a {
     color: var(--color-light);
+    font-weight: 700;
     text-decoration: none;
   }
 </style>

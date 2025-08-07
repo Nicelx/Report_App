@@ -57,8 +57,8 @@ export default {
       placeholder="password"
     />
     <div class = "btns">
-      <button class = "btn btn-primary">Log In</button>
-      <button class = "btn btn-outline">Register</button>
+      <button @click="login" class = "btn btn-primary">Log In</button>
+      <button class = "btn btn-outline"><router-link to="/register">Register</router-link></button>
     </div>
   </div>
 </template>
