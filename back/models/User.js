@@ -8,9 +8,12 @@ class User {
         "INSERT INTO users (username,  password) VALUES (?, ?)",
         [username, password]
       );
-    } catch (error) {}
+      if (result) return result.insertId;
+    } catch (error) {
+      console.error('create method catch error')
+    }
 
-    if (result) return result.insertId;
+    
   }
 
   static async getAll() {

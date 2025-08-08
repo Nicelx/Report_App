@@ -40,7 +40,7 @@ export default {
       placeholder="password"
     />
     <div class = "btns">
-      <button class = "btn btn-primary">Register</button>
+      <button @click="createUser" class = "btn btn-primary">Register</button>
     </div>
   </div>
 </template>

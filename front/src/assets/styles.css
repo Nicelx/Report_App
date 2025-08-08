@@ -341,13 +341,13 @@ select {
 .task__project {
   font-weight: 600;
   color: var(--color-secondary);
-  /* font-size: 0.9rem; */
+  font-size: 12px;
   text-shadow: 0 0 5px rgba(255, 0, 208, 0.4);
 }
 
 .task__time {
   color: rgba(230, 255, 244, 0.7);
-  /* font-size: 0.85rem; */
+  font-size: 12px;
 }
 
 .task__actions {

@@ -18,10 +18,6 @@ export default {
     Tasks,
   },
   methods: {
-    async getTasks() {
-      console.log("here full list of tasks");
-    },
-
     getDate() {
       const today = new Date();
       const year = today.getFullYear();
@@ -90,7 +86,7 @@ export default {
       });
 
       const data = await response.json(); // предполагается, что сервер возвращает JSON
-      // console.log(data);
+     
       this.tasks = data;
     },
     toggleIsAddOpen() {
@@ -152,7 +148,7 @@ export default {
       <button @click="addTask" class="btn btn-primary m1">Add</button>
     </div>
 
-    <Tasks :tasks="tasks" />
+    <Tasks :tasks="tasks" :projects="projects" />
 
     <!-- <div class="message message--success">Успех!</div>
     <div class="message message--success">Задача успешно создана</div>
