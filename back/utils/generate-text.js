@@ -7,28 +7,28 @@ const generate = async () => {
   const root = path.join(__dirname, "..");
 
   // all
-  const paths = [
-    "config/db.js",
-    "controllers/authController.js",
-    "controllers/infoController.js",
-    "controllers/taskController.js",
-    "controllers/userController.js",
-    "middleware/auth.js",
-    "models/Project.js",
-    "models/Task.js",
-    "models/User.js",
-    'models/Service.js',
-    "index.js",
-    "../front/src/assets/styles.css",
-    "../front/src/components/Tasks.vue",
-    "../front/src/router/index.js",
-    "../front/src/views/Home.vue",
-    "../front/src/views/Login.vue",
-    "../front/src/views/Register.vue",
-    "../front/src/views/Settings.vue",
-    "../front/src/App.vue",
-    "../front/src/main.js",
-  ];
+  // const paths = [
+  //   "config/db.js",
+  //   "controllers/authController.js",
+  //   "controllers/infoController.js",
+  //   "controllers/taskController.js",
+  //   "controllers/userController.js",
+  //   "middleware/auth.js",
+  //   "models/Project.js",
+  //   "models/Task.js",
+  //   "models/User.js",
+  //   'models/Service.js',
+  //   "index.js",
+  //   "../front/src/assets/styles.css",
+  //   "../front/src/components/Tasks.vue",
+  //   "../front/src/router/index.js",
+  //   "../front/src/views/Home.vue",
+  //   "../front/src/views/Login.vue",
+  //   "../front/src/views/Register.vue",
+  //   "../front/src/views/Settings.vue",
+  //   "../front/src/App.vue",
+  //   "../front/src/main.js",
+  // ];
 
   // back
   // const paths = [
@@ -45,18 +45,18 @@ const generate = async () => {
   //     'index.js',
   // ];
 
-  //   front;
-  //   const paths = [
-  //     "../front/src/assets/styles.css",
-  //     "../front/src/components/Tasks.vue",
-  //     "../front/src/router/index.js",
-  //     "../front/src/views/Home.vue",
-  //     "../front/src/views/Login.vue",
-  //     "../front/src/views/Register.vue",
-  //     "../front/src/views/Settings.vue",
-  //     "../front/src/App.vue",
-  //     "../front/src/main.js",
-  //   ];
+    // front;
+    const paths = [
+      "../front/src/assets/styles.css",
+      "../front/src/components/Tasks.vue",
+      "../front/src/router/index.js",
+      "../front/src/views/Home.vue",
+      "../front/src/views/Login.vue",
+      "../front/src/views/Register.vue",
+      "../front/src/views/Settings.vue",
+      "../front/src/App.vue",
+      "../front/src/main.js",
+    ];
 
   paths.forEach((item, index) => {
     paths[index] = path.join(root, item);

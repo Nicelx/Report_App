@@ -12,8 +12,6 @@ class User {
     } catch (error) {
       console.error('create method catch error')
     }
-
-    
   }
 
   static async getAll() {

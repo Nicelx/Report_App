@@ -5,7 +5,8 @@ export default {
     return {
       isAddOpen: false,
       taskDescription: "",
-      taskDate: this.getDate(),
+      // taskDate: this.getDate(),
+      taskDate: new Date().toISOString().slice(0, 10),
       message: "",
       selectedProject: "",
       selectedService: "",
@@ -19,12 +20,21 @@ export default {
   },
   methods: {
     getDate() {
-      const today = new Date();
-      const year = today.getFullYear();
-      const month = String(today.getMonth() + 1).padStart(2, "0");
-      const day = String(today.getDate()).padStart(2, "0");
+      // const today = new Date();
+      // const year = today.getFullYear();
+      // const month = String(today.getMonth() + 1).padStart(2, "0");
+      // const day = String(today.getDate()).padStart(2, "0");
 
-      return `${year}-${month}-${day}`;
+      // return `${year}-${month}-${day}`;
+
+      const now = new Date();
+
+      const hours = String(now.getHours()).padStart(2, "0");
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+      const seconds = String(now.getSeconds()).padStart(2, "0")
+      const datetimeValue = `${this.taskDate} ${hours}:${minutes}:${seconds}`;
+      
+      return datetimeValue;
     },
 
     async addTask() {
@@ -42,7 +52,7 @@ export default {
           task_description: this.taskDescription,
           project_id: this.selectedProject,
           service_id: this.selectedService,
-          completed_date: this.taskDate,
+          completed_date: this.getDate(),
         }),
       });
 

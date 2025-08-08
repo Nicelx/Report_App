@@ -17,6 +17,7 @@ export default {
       const utcDate = new Date(dateStr);
       const ruDate = utcDate.toLocaleDateString("ru-RU");
       return ruDate;
+      // return dateStr;
     },
   },
   computed: {

@@ -1,324 +1,5 @@
 
 ********************* 
-C:\projects\Vue\malina reports\back\config\db.js
-
-const mysql = require('mysql2/promise');
-
-const pool = mysql.createPool({
-  host:'localhost',
-  user: process.env.DB_USER,
-  password: process.env.DB_PWD,
-  database: 'report_app',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
-});
-
-module.exports = pool;
-********************* 
-C:\projects\Vue\malina reports\back\controllers\authController.js
-
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
-
-exports.login = async (req, res) => {
-  console.log(req.body);
-
-  const { username, password } = req.body;
-  const user = await User.findByUsername(username);
-
-  if (!user) {
-    return res.status(401).json({ message: "Invalid credentials" });
-  }
-
-  if (!(await User.comparePasswords(password, user.password))) {
-    return res.status(401).json({ message: "Invalid credentials" });
-  }
-
-  const token = jwt.sign(
-    { id: user.id, username: user.username },
-    process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN }
-  );
-  return res.json({
-    message: "Login successful",
-    token,
-    user: { id: user.id, username: user.username },
-  });
-};
-
-********************* 
-C:\projects\Vue\malina reports\back\controllers\infoController.js
-
-const pool = require("../config/db");
-const Project = require("../models/Project");
-const Service = require("../models/Service");
-
-exports.getInfo = async (req, res) => {
-  const data = {}
-
-  const projects = await Project.getAll();
-  const services = await Service.getAll();
-
-  if (!projects || !services) {
-    return res.status(500).json({message: 'projects или services не найдены в бд'})
-  }
-  data.projects = projects;
-  data.services = services;
-
-  res.send(data);
-
-
-//   getting services
-
-
-};
-
-********************* 
-C:\projects\Vue\malina reports\back\controllers\taskController.js
-
-const Task = require("../models/Task");
-
-exports.addTask = async (req, res) => {
-  console.log(req.user);
-  const { user_id, task_description, completed_date, project_id, service_id } =
-    req.body;
-
-  if (
-    !user_id ||
-    !task_description ||
-    !completed_date ||
-    !project_id ||
-    !service_id
-  )
-    return res.status(500).json({
-      message: "Не все поля имеют значения",
-    });
-
-  try {
-    await Task.addTask({
-      user_id,
-      task_description,
-      completed_date,
-      project_id,
-      service_id,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      message: "Ошибка добавления задачи в базу данных",
-    });
-  }
-
-  return res.send({
-    message: "task added",
-  });
-};
-
-********************* 
-C:\projects\Vue\malina reports\back\controllers\userController.js
-
-const User = require("../models/User");
-
-exports.getUsers = async (req, res) => {
-  try {
-    const users = await User.getAll(); // Используем const
-    res.json(users); // Отправляем один ответ
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error" }); // Один ответ при ошибке
-  }
-};
-
-exports.createUser = async (req, res) => {
-  try {
-    response = await User.createUser({
-      username: req.body.username,
-      passwrod: req.body.passwrod,
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-
-  if (response)
-    res.send({
-      message: "user created",
-    });
-};
-
-********************* 
-C:\projects\Vue\malina reports\back\middleware\auth.js
-
-const jwt = require('jsonwebtoken');
-
-
-module.exports = (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    console.log(authHeader);
-
-     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ message: 'Authentication required' });
-    }
-
-    const token = authHeader.split(' ')[1];
-
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded;    // Добавляем данные пользователя в запрос
-        console.log(req.user);
-    } catch (error) {
-        return res.status(401).json({ message: 'Invalid or expired token' });
-    }
-
-    // console.log('token', token);
-    // console.log('decoded', decoded);
-    console.log('auth ok');
-    next();
-}
-********************* 
-C:\projects\Vue\malina reports\back\models\Project.js
-
-const  pool  = require("../config/db");
-
-class Project {
-  static async getAll() {
-    const [rows] = await pool.query("SELECT * FROM projects");
-    return rows;
-  }
-}
-
-module.exports = Project;
-
-********************* 
-C:\projects\Vue\malina reports\back\models\Task.js
-
-const  pool  = require("../config/db");
-
-class Task {
-   static async addTask({user_id, task_description, project_id, service_id, completed_date}) {
-     try {
-      const [result] = await pool.execute(
-        "INSERT INTO tasks (user_id, task_description, completed_date, project_id, service_id) VALUES (?, ?, ?, ?, ?)",
-        [user_id,task_description, completed_date, project_id, service_id]
-      );
-
-       if (result) return result.insertId;
-    } catch (error) {
-        console.error(error)
-    }
-
-   
-  }
-
-  static async getAll() {
-    const [rows] = await pool.query("SELECT * FROM tasks");
-    return rows;
-  }
-}
-
-module.exports = Task;
-********************* 
-C:\projects\Vue\malina reports\back\models\User.js
-
-const pool = require("../config/db");
-const bcrypt = require("bcryptjs");
-
-class User {
-  static async create({ username, password }) {
-    try {
-      const [result] = await pool.execute(
-        "INSERT INTO users (username,  password) VALUES (?, ?)",
-        [username, password]
-      );
-    } catch (error) {}
-
-    if (result) return result.insertId;
-  }
-
-  static async getAll() {
-    const [rows] = await pool.query("SELECT id, username FROM users");
-    return rows;
-  }
-  static async findByUsername(username) {
-    try {
-      const [users] = await pool.execute(
-        "SELECT * FROM users WHERE username = ?",
-        [username]
-      );
-      return users[0];
-    } catch (error) {}
-  }
-
-  static async comparePasswords(candidatePassword, hashedPassword) {
-    if (candidatePassword === hashedPassword) return true;
-    return false;
-
-    // return bcrypt.compare(candidatePassword, hashedPassword);
-  }
-}
-
-module.exports = User;
-
-********************* 
-C:\projects\Vue\malina reports\back\models\Service.js
-
-const  pool  = require("../config/db");
-
-class Service {
-  static async getAll() {
-    const [rows] = await pool.query("SELECT * FROM Services");
-    return rows;
-  }
-}
-
-module.exports = Service;
-********************* 
-C:\projects\Vue\malina reports\back\index.js
-
-const express = require("express");
-const cors = require("cors");
-require('dotenv').config();
-const authMiddleware = require('./middleware/auth');
-
-const User = require("./models/User");
-
-const { getUsers } = require("./controllers/userController");
-const { login } = require("./controllers/authController");
-const {addTask} = require('./controllers/taskController');
-const { getInfo } = require("./controllers/infoController");
-
-const app = express();
-const port = process.env.PORT || 3000;
-
-app.use(cors());
-app.use(express.json());
-
-app.get("/get-info", authMiddleware , getInfo);
-app.get("/get-info", getUsers);
-app.get("/get-info2", async (req, res) => {
-  // В этом блоке можно обработать запрос и отправить ответ
-  res.send({ message: "Это ответ на GET-запрос get-info2" });
-});
-app.post("/login", login);
-
-app.post("/create-user", async (req, res) => {
-  console.log(req.body);
-
-  await User.create({
-    username: req.body.username,
-    password: req.body.password,
-  });
-
-  // В этом блоке можно обработать запрос и отправить ответ
-  res.send({ message: "Пользователь создан" });
-});
-
-app.post("/add-task", authMiddleware, addTask);
-
-app.listen(port, () => {
-  console.log(`Сервер запущен на порту ${port}`);
-});
-
-********************* 
 C:\projects\Vue\malina reports\front\src\assets\styles.css
 
 /* http://meyerweb.com/eric/tools/css/reset/ 
@@ -664,13 +345,13 @@ select {
 .task__project {
   font-weight: 600;
   color: var(--color-secondary);
-  /* font-size: 0.9rem; */
+  font-size: 12px;
   text-shadow: 0 0 5px rgba(255, 0, 208, 0.4);
 }
 
 .task__time {
   color: rgba(230, 255, 244, 0.7);
-  /* font-size: 0.85rem; */
+  font-size: 12px;
 }
 
 .task__actions {
@@ -740,60 +421,63 @@ C:\projects\Vue\malina reports\front\src\components\Tasks.vue
 
 <script>
 export default {
-}
+  props: {
+    tasks: {
+      type: Array,
+      required: true,
+      default: () => [], // Значение по умолчанию - пустой массив
+    },
+    projects: {
+      type: Array,
+      required: true,
+      default: () => [], // Значение по умолчанию - пустой массив
+    },
+  },
+  methods: {
+    formatDate(dateStr) {
+      const utcDate = new Date(dateStr);
+      const ruDate = utcDate.toLocaleDateString("ru-RU");
+      return ruDate;
+    },
+  },
+  computed: {
+    projectMap() {
+      const map = {};
+      this.projects.forEach((project) => {
+        map[project.id] = project.name;
+      });
+      return map;
+    },
+    sortedTasks() {
+      return [...this.tasks].sort((a, b) => {
+        return new Date(b.completed_date) - new Date(a.completed_date);
+      });
+    },
+  },
+};
 </script>
 
 <template>
-    <div class="tasks">
-      <p class="title-secondary">Список задач:</p>
-      <div class="tasks__list">
+  <div class="tasks">
+    <p class="title-secondary">Список выполненных задач:</p>
+    <div class="tasks__list">
+      
+      <div v-for="task in sortedTasks" :key="task.id" class="task">
+        <p class="task__description">
+          {{ task.task_description }}
+        </p>
 
-        <div class="task">
-          <p class="task__description">
-            Описание задачи, что сделал тут скорее всего не будет много текста
-          </p>
-
-          <div class = "task__extra">
-            <p class="task__project">проект задачи</p>
-            <p class="task__time">12.07.2025 (2 дн назад)</p>  
-          </div>
-
-          <div class="task__actions">
-            <button class="btn btn-accent task__edit">Edit</button>
-          </div>
+        <div class="task__extra">
+          <p class="task__project">{{ projectMap[task.project_id] }}</p>
+          <p class="task__time">{{ formatDate(task.completed_date) }}</p>
         </div>
 
-        <div class="task">
-          <p class="task__description">
-            Описание задачи, что сделал тут скорее всего не будет много текста Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatum tempora illum molestias obcaecati iure dolor ipsum vitae numquam ad saepe!
-          </p>
-
-          <div class = "task__extra">
-            <p class="task__project">проект задачи</p>
-            <p class="task__time">12.07.2025 (3 дн назад)</p>  
-          </div>
-
-          <div class="task__actions">
-            <button class="btn btn-accent task__edit">Edit</button>
-          </div>
+        <div class="task__actions">
+          <button class="btn btn-accent task__edit">Edit</button>
         </div>
-        <div class="task">
-          <p class="task__description">
-            Описание задачи, что сделал тут скорее всего не будет много текста
-          </p>
-
-          <div class = "task__extra">
-            <p class="task__project">проект задачи</p>
-            <p class="task__time">12.07.2025 (1 дн назад)</p>  
-          </div>
-
-          <div class="task__actions">
-            <button class="btn btn-accent task__edit">Edit</button>
-          </div>
-        </div>
-
       </div>
     </div>
+  </div>
 </template>
 
 ********************* 
@@ -849,27 +533,16 @@ export default {
       taskDate: this.getDate(),
       message: "",
       selectedProject: "",
-      projectsOptions: [
-        { id: 1, text: "Project 1" },
-        { id: 2, text: "Project 2" },
-        { id: 3, text: "Project 3" },
-      ],
       selectedService: "",
-      servicesOptions: [
-        { id: 1, text: "Service 1" },
-        { id: 2, text: "Service 2" },
-        { id: 3, text: "Service 3" },
-      ],
+      projects: [],
+      services: [],
+      tasks: [],
     };
   },
   components: {
     Tasks,
   },
   methods: {
-    async getTasks() {
-      console.log("here full list of tasks");
-    },
-
     getDate() {
       const today = new Date();
       const year = today.getFullYear();
@@ -897,10 +570,14 @@ export default {
           completed_date: this.taskDate,
         }),
       });
+
+      console.log('response' ,response);
+
+      this.updateTasks();
     },
 
     async getInfo() {
-     const token = localStorage.getItem("authToken");
+      const token = localStorage.getItem("authToken");
       // const { id: userId } = JSON.parse(localStorage.getItem("user"));
 
       const response = await fetch("http://localhost:3000/get-info", {
@@ -916,14 +593,38 @@ export default {
 
       const data = await response.json(); // предполагается, что сервер возвращает JSON
       console.log(data);
+
+      this.projects = data.projects;
+      this.services = data.services;
+      this.tasks = data.tasks;
+    },
+
+    async updateTasks() {
+      const token = localStorage.getItem("authToken");
+      
+      const response = await fetch("http://localhost:3000/get-tasks", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json(); // предполагается, что сервер возвращает JSON
+     
+      this.tasks = data;
     },
     toggleIsAddOpen() {
       this.isAddOpen = !this.isAddOpen;
     },
+    getProjectName(projectId) {
+      const project = this.projects.find((p) => p.id === projectId);
+      return project ? project.name : "Неизвестный проект";
+    },
   },
-  // mounted: {
-
-  // }
+  mounted() {
+    this.getInfo(); // Вызов метода при загрузке компонента
+  },
 };
 </script>
 
@@ -936,9 +637,7 @@ export default {
     <button @click="toggleIsAddOpen" class="btn btn-accent m1">
       Add new task report
     </button>
-    <button @click="getInfo" class="btn btn-accent m1">
-      get info
-    </button>
+    <button @click="getInfo" class="btn btn-accent m1">get info</button>
 
     <div class="add-task-block" v-if="isAddOpen">
       <input
@@ -952,35 +651,34 @@ export default {
       <select class="select m1" v-model="selectedProject">
         <option disabled value="">Choose project</option>
         <option
-          v-for="option in projectsOptions"
-          :key="option.id"
-          :value="option.id"
+          v-for="project in projects"
+          :key="project.id"
+          :value="project.id"
         >
-          {{ option.text }}
+          {{ project.name }}
         </option>
       </select>
 
       <select class="select m1" v-model="selectedService">
         <option disabled value="">Choose service</option>
         <option
-          v-for="option in servicesOptions"
-          :key="option.id"
-          :value="option.id"
+          v-for="service in services"
+          :key="service.id"
+          :value="service.id"
         >
-          {{ option.text }}
+          {{ service.name }}
         </option>
       </select>
 
       <button @click="addTask" class="btn btn-primary m1">Add</button>
     </div>
 
-    <Tasks />
+    <Tasks :tasks="tasks" :projects="projects" />
 
     <!-- <div class="message message--success">Успех!</div>
     <div class="message message--success">Задача успешно создана</div>
 
     <div class="message message--error">Ошибка</div> -->
-   
   </div>
 </template>
 
@@ -1104,7 +802,7 @@ export default {
       placeholder="password"
     />
     <div class = "btns">
-      <button class = "btn btn-primary">Register</button>
+      <button @click="createUser" class = "btn btn-primary">Register</button>
     </div>
   </div>
 </template>
@@ -1114,11 +812,20 @@ C:\projects\Vue\malina reports\front\src\views\Settings.vue
 <script>
 export default {
   data() {
-    return {};
+    return {
+      taskDateTime: this.getCurrentDateTime(),
+    };
   },
-  methods: {},
-};
+  methods: {
+    getCurrentDateTime() {
+      const now = new Date();
 
+      now.setSeconds(0, 0);
+
+      return now.toISOString().slice(0, 16);
+    },
+  },
+};
 </script>
 
 <template>
@@ -1128,7 +835,14 @@ export default {
     <button class="btn btn-accent">Accent</button>
     <button class="btn btn-outline">Outline</button>
   </div>
+
+  <input class="input m1" v-model="taskDateTime" type="datetime-local" />
+
+  <p>
+    {{  }}
+  </p>
 </template>
+
 ********************* 
 C:\projects\Vue\malina reports\front\src\App.vue
 
