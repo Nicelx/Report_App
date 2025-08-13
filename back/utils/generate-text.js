@@ -47,9 +47,12 @@ const generate = async () => {
 
     // front;
     const paths = [
-      "../front/src/assets/styles.css",
+      // "../front/src/assets/styles.css",
       "../front/src/components/Tasks.vue",
       "../front/src/router/index.js",
+      "../front/src/stores/index.js",
+      "../front/src/stores/exampleStore.js",
+      "../front/src/utils/util.js",
       "../front/src/views/Home.vue",
       "../front/src/views/Login.vue",
       "../front/src/views/Register.vue",
