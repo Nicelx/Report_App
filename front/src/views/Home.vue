@@ -1,42 +1,35 @@
 <script>
 import Tasks from "@/components/Tasks.vue";
+import { useExampleStore } from "@/stores";
+import { useTaskStore } from "@/stores/taskStore";
+
+import { getDatetime } from "@/utils/util";
+import { mapStores } from "pinia";
+
+
 export default {
   data() {
     return {
       isAddOpen: false,
       taskDescription: "",
-      // taskDate: this.getDate(),
       taskDate: new Date().toISOString().slice(0, 10),
       message: "",
       selectedProject: "",
       selectedService: "",
       projects: [],
       services: [],
-      tasks: [],
+      // tasks: [],
     };
   },
   components: {
     Tasks,
   },
+
+  computed: {
+    // Доступ через this.exampleStore
+    ...mapStores(useExampleStore, useTaskStore)
+  },
   methods: {
-    getDate() {
-      // const today = new Date();
-      // const year = today.getFullYear();
-      // const month = String(today.getMonth() + 1).padStart(2, "0");
-      // const day = String(today.getDate()).padStart(2, "0");
-
-      // return `${year}-${month}-${day}`;
-
-      const now = new Date();
-
-      const hours = String(now.getHours()).padStart(2, "0");
-      const minutes = String(now.getMinutes()).padStart(2, "0");
-      const seconds = String(now.getSeconds()).padStart(2, "0")
-      const datetimeValue = `${this.taskDate} ${hours}:${minutes}:${seconds}`;
-      
-      return datetimeValue;
-    },
-
     async addTask() {
       const token = localStorage.getItem("authToken");
       const { id: userId } = JSON.parse(localStorage.getItem("user"));
@@ -52,7 +45,7 @@ export default {
           task_description: this.taskDescription,
           project_id: this.selectedProject,
           service_id: this.selectedService,
-          completed_date: this.getDate(),
+          completed_date: getDatetime(this.taskDate),
         }),
       });
 
@@ -108,7 +101,8 @@ export default {
     },
   },
   mounted() {
-    this.getInfo(); // Вызов метода при загрузке компонента
+    // this.getInfo(); // Вызов метода при загрузке компонента
+    this.taskStore.getInfo2();
   },
 };
 </script>
@@ -116,6 +110,9 @@ export default {
 <template>
   <div class="wrapper">
     <h1 class="title m3">Your Tasks</h1>
+    <p>{{ this.exampleStore.counter }}</p>
+    <button @click="this.exampleStore.increment()">+1</button>
+
 
     <p v-if="message">{{ message }}</p>
 
@@ -123,6 +120,11 @@ export default {
       Add new task report
     </button>
     <button @click="getInfo" class="btn btn-accent m1">get info</button>
+    <button @click="this.taskStore.getInfo2()" class="btn btn-accent m1">get info2</button>
+    <button @click="this.taskStore.pushTask()" class="btn btn-accent m1">pushTask</button>
+    <p>
+      {{  this.taskStore.tasks}}
+    </p>
 
     <div class="add-task-block" v-if="isAddOpen">
       <input
@@ -158,7 +160,7 @@ export default {
       <button @click="addTask" class="btn btn-primary m1">Add</button>
     </div>
 
-    <Tasks :tasks="tasks" :projects="projects" />
+    <Tasks :tasks="this.taskStore.tasks" :projects="this.taskStore.projects" />
 
     <!-- <div class="message message--success">Успех!</div>
     <div class="message message--success">Задача успешно создана</div>

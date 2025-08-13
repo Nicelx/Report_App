@@ -1,4 +1,7 @@
 <script>
+import { useExampleStore } from "@/stores";
+import { mapStores } from "pinia";
+
 export default {
   data() {
     return {
@@ -21,9 +24,10 @@ export default {
       const hours = String(now.getHours()).padStart(2, "0");
       const minutes = String(now.getMinutes()).padStart(2, "0");
       const datetimeValue = `${this.inputDate} ${hours}:${minutes}:00`;
-      
+
       return datetimeValue;
     },
+    ...mapStores(useExampleStore),
   },
 };
 </script>
@@ -35,6 +39,9 @@ export default {
     <button class="btn btn-accent">Accent</button>
     <button class="btn btn-outline">Outline</button>
   </div>
+
+  <p>{{ this.exampleStore.counter }}</p>
+  <button @click="this.exampleStore.increment()">+1</button>
 
   <input
     class="input m1"
