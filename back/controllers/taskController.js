@@ -34,3 +34,11 @@ exports.addTask = async (req, res) => {
     message: "task added",
   });
 };
+
+
+exports.updateTask = async (req, res) => {
+  console.log('updateTask');
+  return res.send({
+    message: 'task updated'
+  })
+}

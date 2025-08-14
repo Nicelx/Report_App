@@ -32,3 +32,4 @@ logs
 back/node_modules
 back/.env
 back/utils
+back/utils/result.txt

@@ -20,6 +20,12 @@ class Task {
     }
   }
 
+  // static async updateTask({
+
+  // }) {
+
+  // }
+
   static async getAll(user_id) {
     let query;
     if (user_id) {

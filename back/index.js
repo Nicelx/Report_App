@@ -7,7 +7,7 @@ const User = require("./models/User");
 
 const { getUsers } = require("./controllers/userController");
 const { login } = require("./controllers/authController");
-const {addTask} = require('./controllers/taskController');
+const {addTask, updateTask} = require('./controllers/taskController');
 const { getInfo, getTasks } = require("./controllers/infoController");
 
 const app = express();
@@ -18,10 +18,8 @@ app.use(express.json());
 
 app.get("/get-info", authMiddleware , getInfo);
 app.get("/get-tasks", authMiddleware, getTasks);
-app.get("/get-info2", async (req, res) => {
-  // В этом блоке можно обработать запрос и отправить ответ
-  res.send({ message: "Это ответ на GET-запрос get-info2" });
-});
+app.put("/update-task/:id", authMiddleware, updateTask);
+
 app.post("/login", login);
 
 app.post("/create-user", async (req, res) => {
