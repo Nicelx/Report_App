@@ -1,5 +1,10 @@
 <script>
+import { mapStores } from "pinia";
+
+import { useTaskStore, useControlsStore } from "@/stores";
+
 export default {
+  computed: {},
   props: {
     tasks: {
       type: Array,
@@ -20,6 +25,7 @@ export default {
     },
   },
   computed: {
+    ...mapStores(useControlsStore),
     projectMap() {
       const map = {};
       this.projects.forEach((project) => {
@@ -40,7 +46,6 @@ export default {
   <div class="tasks">
     <p class="title-secondary">Список выполненных задач:</p>
     <div class="tasks__list">
-      
       <div v-for="task in sortedTasks" :key="task.id" class="task">
         <p class="task__description">
           {{ task.task_description }}
@@ -52,7 +57,13 @@ export default {
         </div>
 
         <div class="task__actions">
-          <button class="btn btn-accent task__edit">Edit</button>
+          <button
+            @click="this.controlsStore.editOpen(task.id)"
+            class="btn btn-accent task__edit"
+          >
+            Edit
+          </button>
+          <!-- <button class="btn btn-accent task__edit">Close Edit</button> -->
         </div>
       </div>
     </div>

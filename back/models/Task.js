@@ -20,11 +20,34 @@ class Task {
     }
   }
 
-  // static async updateTask({
+  static async updateTask({
+    id,
+    task_description,
+    completed_date,
+    project_id,
+    service_id,
+  }) {
+    try {
+      if (id === undefined) {
+        throw new Error("Task ID is required for update");
+      }
+      const executedStr =  `
+        update tasks
+        set
+        task_description = '${task_description}',
+        completed_date = '${completed_date}',
+        project_id = ${project_id},
+        service_id = ${service_id}
+        where id = ${id}
+      `;
+      console.log(executedStr);
+      const [result] = await pool.execute(executedStr);
+      console.log("result =", result);
+    } catch (error) {
+        throw new Error(error);
+    }
 
-  // }) {
-
-  // }
+  }
 
   static async getAll(user_id) {
     let query;

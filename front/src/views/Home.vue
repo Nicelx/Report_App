@@ -3,20 +3,13 @@ import { mapStores } from "pinia";
 
 import Tasks from "@/components/Tasks.vue";
 
-import { useTaskStore } from "@/stores";
+import { useTaskStore, useControlsStore } from "@/stores";
 import { getDatetime } from "@/utils/util";
-
 
 export default {
   data() {
     return {
-      isAddOpen: false,
-      isEditOpen: false,
-      taskDescription: "",
-      taskDate: new Date().toISOString().slice(0, 10),
       message: "",
-      selectedProject: "",
-      selectedService: "",
     };
   },
   components: {
@@ -25,23 +18,55 @@ export default {
 
   computed: {
     // Доступ через this.taskStore
-    ...mapStores( useTaskStore)
+    ...mapStores(useTaskStore, useControlsStore),
+
+    addNewText() {
+      if (this.controlsStore.isControlsOpen) {
+        return 'Close'
+      } else {
+        return 'Add new task report'
+      }
+    }
   },
   methods: {
     addTask() {
       this.taskStore.addTask({
-         task_description: this.taskDescription,
-          project_id: this.selectedProject,
-          service_id: this.selectedService,
-          completed_date: getDatetime(this.taskDate),
-      })
-    },
-    updateTask() {
-      
+        task_description: this.controlsStore.taskDescription,
+        project_id: this.controlsStore.selectedProject,
+        service_id: this.controlsStore.selectedService,
+        completed_date: getDatetime(this.controlsStore.taskDate),
+      });
     },
 
-    toggleIsAddOpen() {
-      this.isAddOpen = !this.isAddOpen;
+    // handleEditTask(taskId) {
+    //   this.isEditOpen = true;
+    //   this.editId = taskId;
+
+    //   const task = this.taskStore.tasks.find((t) => t.id === taskId);
+    //   if (task) {
+    //     this.taskDescription = task.task_description;
+    //     this.taskDate = task.completed_date.slice(0, 10);
+    //     this.selectedProject = task.project_id;
+    //     this.selectedService = task.service_id;
+    //   }
+    // },
+
+    async updateTask(id) {
+      // fetch(`http://localhost:3000//update-task/${id}`);
+
+      const token = localStorage.getItem("authToken");
+
+      const response = await fetch(`http://localhost:3000/update-task/${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id,
+          task_description: "changed",
+        }),
+      });
     },
   },
   mounted() {
@@ -56,24 +81,23 @@ export default {
 
     <p v-if="message">{{ message }}</p>
 
-    <button @click="toggleIsAddOpen" class="btn btn-accent m1">
-      Add new task report
-    </button>
-    <button>Edit task</button>
-    <button @click="this.taskStore.getInfo2()" class="btn btn-accent m1">
-      get info2
+    <button
+      @click="this.controlsStore.newTask"
+      class="btn btn-accent m1"
+    >
+      {{ addNewText }}
     </button>
 
-    <div class="add-task-block" v-if="isAddOpen">
+    <div class="add-task-block" v-if="this.controlsStore.isControlsOpen">
       <input
         class="input m1"
-        v-model="taskDescription"
+        v-model="this.controlsStore.taskDescription"
         type="textarea"
         placeholder="task description"
       />
-      <input class="input m1" v-model="taskDate" type="date" />
+      <input class="input m1" v-model="this.controlsStore.taskDate" type="date" />
 
-      <select class="select m1" v-model="selectedProject">
+      <select class="select m1" v-model="this.controlsStore.selectedProject">
         <option disabled value="">Choose project</option>
         <option
           v-for="project in this.taskStore.projects"
@@ -84,7 +108,7 @@ export default {
         </option>
       </select>
 
-      <select class="select m1" v-model="selectedService">
+      <select class="select m1" v-model="this.controlsStore.selectedService">
         <option disabled value="">Choose service</option>
         <option
           v-for="service in this.taskStore.services"
@@ -95,18 +119,23 @@ export default {
         </option>
       </select>
 
-      <!-- <button @click="addTask" class="btn btn-primary m1">Add</button> -->
-      <button @click="addTask" class="btn btn-primary m1">
-        Add task with store
+      <button v-if="!this.controlsStore.isEditOpen" @click="addTask" class="btn btn-primary m1">Add new task</button>
+      <button
+        v-if="this.controlsStore.isEditOpen"
+        @click="this.controlsStore.saveEdit"
+        class="btn btn-primary m1"
+      >
+        Save edited task id:{{ this.controlsStore.editId }}
       </button>
-      <button @click="updateTask">update task</button>
+      <button
+        v-if="this.controlsStore.isEditOpen"
+        @click="this.controlsStore.editClose()"
+        class="btn btn-outline m1"
+      >
+        Close edititng
+      </button>
     </div>
 
     <Tasks :tasks="this.taskStore.tasks" :projects="this.taskStore.projects" />
   </div>
 </template>
-
-<!-- <div class="message message--success">Успех!</div>
-    <div class="message message--success">Задача успешно создана</div>
-
-    <div class="message message--error">Ошибка</div> -->

@@ -1,2 +1,2 @@
-export * from './exampleStore';
+export * from './controlsStore';
 export * from './taskStore';

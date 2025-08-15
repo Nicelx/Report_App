@@ -35,10 +35,20 @@ exports.addTask = async (req, res) => {
   });
 };
 
-
 exports.updateTask = async (req, res) => {
-  console.log('updateTask');
-  return res.send({
-    message: 'task updated'
-  })
-}
+  try {
+    const updates = req.body;
+
+    await Task.updateTask({
+      ...updates,
+    });
+
+    return res.send({
+      message: "task updated",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Ошибка обновления задачи",
+    });
+  }
+};

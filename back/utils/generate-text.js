@@ -19,51 +19,19 @@ const generate = async () => {
     "models/User.js",
     "models/Service.js",
     "index.js",
-    "../front/src/components/Tasks.vue",
-    "../front/src/router/index.js",
-    "../front/src/stores/index.js",
-    "../front/src/stores/exampleStore.js",
-    "../front/src/stores/taskStore.js",
-    "../front/src/utils/util.js",
-    "../front/src/views/Home.vue",
-    "../front/src/views/Login.vue",
-    "../front/src/views/Register.vue",
-    "../front/src/views/Settings.vue",
-    "../front/src/App.vue",
-    "../front/src/main.js",
+    // "../front/src/components/Tasks.vue",
+    // "../front/src/router/index.js",
+    // "../front/src/stores/index.js",
+    // "../front/src/stores/taskStore.js",
+    // "../front/src/stores/controlsStore.js",
+    // "../front/src/utils/util.js",
+    // "../front/src/views/Home.vue",
+    // "../front/src/views/Login.vue",
+    // "../front/src/views/Register.vue",
+    // "../front/src/views/Settings.vue",
+    // "../front/src/App.vue",
+    // "../front/src/main.js",
   ];
-
-  // back
-  // const paths = [
-  //     'config/db.js',
-  //     'controllers/authController.js',
-  //     'controllers/infoController.js',
-  //     'controllers/taskController.js',
-  //     'controllers/userController.js',
-  //     'middleware/auth.js',
-  //     'models/Project.js',
-  //     'models/Task.js',
-  //     'models/User.js',
-  //     'models/Service.js',
-  //     'index.js',
-  // ];
-
-  // front;
-  // "../front/src/assets/styles.css",
-  // const paths = [
-  //   "../front/src/components/Tasks.vue",
-  //   "../front/src/router/index.js",
-  //   "../front/src/stores/index.js",
-  //   "../front/src/stores/exampleStore.js",
-  //   "../front/src/stores/taskStore.js",
-  //   "../front/src/utils/util.js",
-  //   "../front/src/views/Home.vue",
-  //   "../front/src/views/Login.vue",
-  //   "../front/src/views/Register.vue",
-  //   "../front/src/views/Settings.vue",
-  //   "../front/src/App.vue",
-  //   "../front/src/main.js",
-  // ];
 
   paths.forEach((item, index) => {
     paths[index] = path.join(root, item);

@@ -1,5 +1,5 @@
 <script>
-import { useExampleStore } from "@/stores";
+// import { useExampleStore } from "@/stores";
 import { mapStores } from "pinia";
 
 export default {
@@ -27,7 +27,7 @@ export default {
 
       return datetimeValue;
     },
-    ...mapStores(useExampleStore),
+    // ...mapStores(useExampleStore),
   },
 };
 </script>
@@ -54,3 +54,9 @@ export default {
     {{ formattedDate }}
   </p>
 </template>
+
+
+<!-- <div class="message message--success">Успех!</div>
+    <div class="message message--success">Задача успешно создана</div>
+
+    <div class="message message--error">Ошибка</div> -->

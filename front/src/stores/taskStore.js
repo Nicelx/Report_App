@@ -38,7 +38,6 @@ export const useTaskStore = defineStore("task", {
       });
 
       const data = await response.json(); // предполагается, что сервер возвращает JSON
-      console.log(data);
 
       this.projects = data.projects;
       this.services = data.services;
@@ -60,5 +59,29 @@ export const useTaskStore = defineStore("task", {
 
       this.tasks = data;
     },
+
+    async updateTask(taskId, taskData) {
+      const token = localStorage.getItem("authToken");
+
+      const response = await fetch(`http://localhost:3000/update-task/${taskId}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: taskId,
+          ...taskData
+        }),
+      });
+
+      console.log(taskId, taskData);
+
+      await this.updateTasks();
+    },
+
+    getTaskById(id) {
+      return this.tasks.find(task => task.id == id);
+    }
   },
 });
