@@ -2,35 +2,38 @@ import { defineStore } from "pinia";
 import { useTaskStore } from "./taskStore";
 import { getDatetime } from "@/utils/util";
 
-// const taskStore = useTaskStore();
-
 export const useControlsStore = defineStore("controls", {
   state: () => ({
     isControlsOpen: false,
-    isEditOpen: false,
     editId: null,
     taskDescription: "",
     selectedProject: "",
     selectedService: "",
     taskDate: new Date().toISOString().slice(0, 10),
+    mode: 'create'
   }),
   actions: {
     newTask() {
-      this.editId = null;
-      this.isEditOpen = false;
-
-      if (this.isControlsOpen == false) {
-        this.isControlsOpen = true;
-      } else {
-        this.isControlsOpen = false;
+      if (this.mode == 'edit') {
+        this.mode = 'create';
       }
+      this.isControlsOpen = !this.isControlsOpen;
+      this.editId = null;
+    },
+    getFormData() {
+      return {
+        task_description: this.taskDescription,
+        project_id: this.selectedProject,
+        service_id: this.selectedService,
+        completed_date: getDatetime(this.taskDate),
+      };
     },
     editOpen(taskId) {
       const taskStore = useTaskStore();
       const task = taskStore.getTaskById(taskId);
 
       this.isControlsOpen = true;
-      this.isEditOpen = true;
+      this.mode = 'edit';
       this.editId = taskId;
 
       this.taskDescription = task.task_description;
@@ -40,18 +43,8 @@ export const useControlsStore = defineStore("controls", {
     },
     editClose() {
       this.isControlsOpen = false;
-      this.isControlsOpen = false;
+      this.mode = 'create';
       this.editId = null;
     },
-    saveEdit() {
-      const taskStore = useTaskStore();
-      taskStore.updateTask(this.editId, {
-        task_description: this.taskDescription,
-        project_id: this.selectedProject,
-        service_id: this.selectedService,
-        completed_date: getDatetime(this.taskDate),
-      });
-    },
   },
-  getters: {},
 });

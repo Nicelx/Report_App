@@ -63,25 +63,47 @@ export const useTaskStore = defineStore("task", {
     async updateTask(taskId, taskData) {
       const token = localStorage.getItem("authToken");
 
-      const response = await fetch(`http://localhost:3000/update-task/${taskId}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: taskId,
-          ...taskData
-        }),
-      });
+      const response = await fetch(
+        `http://localhost:3000/update-task/${taskId}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: taskId,
+            ...taskData,
+          }),
+        }
+      );
 
-      console.log(taskId, taskData);
+      await this.updateTasks();
+    },
+
+    async deleteTask(taskId) {
+      const token = localStorage.getItem("authToken");
+
+      const response = await fetch(
+        `http://localhost:3000/delete-task/${taskId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: taskId,
+            message: 'lets delete it',
+          }),
+        }
+      );
 
       await this.updateTasks();
     },
 
     getTaskById(id) {
-      return this.tasks.find(task => task.id == id);
-    }
+      return this.tasks.find((task) => task.id == id);
+    },
   },
 });

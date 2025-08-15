@@ -3,8 +3,7 @@ import { mapStores } from "pinia";
 
 import Tasks from "@/components/Tasks.vue";
 
-import { useTaskStore, useControlsStore } from "@/stores";
-import { getDatetime } from "@/utils/util";
+import { useTaskStore, useControlsStore, useCoordinatorStore } from "@/stores";
 
 export default {
   data() {
@@ -17,8 +16,7 @@ export default {
   },
 
   computed: {
-    // Доступ через this.taskStore
-    ...mapStores(useTaskStore, useControlsStore),
+    ...mapStores(useTaskStore, useControlsStore, useCoordinatorStore),
 
     addNewText() {
       if (this.controlsStore.isControlsOpen) {
@@ -28,47 +26,7 @@ export default {
       }
     }
   },
-  methods: {
-    addTask() {
-      this.taskStore.addTask({
-        task_description: this.controlsStore.taskDescription,
-        project_id: this.controlsStore.selectedProject,
-        service_id: this.controlsStore.selectedService,
-        completed_date: getDatetime(this.controlsStore.taskDate),
-      });
-    },
-
-    // handleEditTask(taskId) {
-    //   this.isEditOpen = true;
-    //   this.editId = taskId;
-
-    //   const task = this.taskStore.tasks.find((t) => t.id === taskId);
-    //   if (task) {
-    //     this.taskDescription = task.task_description;
-    //     this.taskDate = task.completed_date.slice(0, 10);
-    //     this.selectedProject = task.project_id;
-    //     this.selectedService = task.service_id;
-    //   }
-    // },
-
-    async updateTask(id) {
-      // fetch(`http://localhost:3000//update-task/${id}`);
-
-      const token = localStorage.getItem("authToken");
-
-      const response = await fetch(`http://localhost:3000/update-task/${id}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id,
-          task_description: "changed",
-        }),
-      });
-    },
-  },
+  methods: {},
   mounted() {
     this.taskStore.getInfo();
   },
@@ -119,21 +77,22 @@ export default {
         </option>
       </select>
 
-      <button v-if="!this.controlsStore.isEditOpen" @click="addTask" class="btn btn-primary m1">Add new task</button>
+      <button v-if="this.controlsStore.mode == 'create'" @click="this.coordinatorStore.addTask" class="btn btn-primary m1">Add new task</button>
       <button
-        v-if="this.controlsStore.isEditOpen"
-        @click="this.controlsStore.saveEdit"
+        v-if="this.controlsStore.mode == 'edit'"
+        @click="this.coordinatorStore.updateTask"
         class="btn btn-primary m1"
       >
         Save edited task id:{{ this.controlsStore.editId }}
       </button>
       <button
-        v-if="this.controlsStore.isEditOpen"
+        v-if="this.controlsStore.mode == 'edit'"
         @click="this.controlsStore.editClose()"
         class="btn btn-outline m1"
       >
         Close edititng
       </button>
+      <button v-if="this.controlsStore.mode == 'edit'" @click="this.taskStore.deleteTask(this.controlsStore.editId)" class="btn btn-secondary m1" >Delete</button>
     </div>
 
     <Tasks :tasks="this.taskStore.tasks" :projects="this.taskStore.projects" />

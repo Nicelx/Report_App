@@ -7,7 +7,7 @@ const User = require("./models/User");
 
 const { getUsers } = require("./controllers/userController");
 const { login } = require("./controllers/authController");
-const {addTask, updateTask} = require('./controllers/taskController');
+const {addTask, updateTask,deleteTask} = require('./controllers/taskController');
 const { getInfo, getTasks } = require("./controllers/infoController");
 
 const app = express();
@@ -19,6 +19,7 @@ app.use(express.json());
 app.get("/get-info", authMiddleware , getInfo);
 app.get("/get-tasks", authMiddleware, getTasks);
 app.put("/update-task/:id", authMiddleware, updateTask);
+app.delete('/delete-task/:id', authMiddleware, deleteTask);
 
 app.post("/login", login);
 

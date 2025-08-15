@@ -63,7 +63,6 @@ export default {
           >
             Edit
           </button>
-          <!-- <button class="btn btn-accent task__edit">Close Edit</button> -->
         </div>
       </div>
     </div>

@@ -48,6 +48,16 @@ class Task {
     }
 
   }
+  static async deleteTask(taskId) {
+    if (!taskId) {
+      throw new Error('task id - false');
+    }
+    const [result] = await pool.execute(`
+        delete from tasks where id = ${taskId}
+      `)
+
+  }
+
 
   static async getAll(user_id) {
     let query;
