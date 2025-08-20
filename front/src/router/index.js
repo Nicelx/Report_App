@@ -2,6 +2,7 @@ import Settings from '../views/Settings.vue';
 import Home from '../views/Home.vue';
 import Login from '../views/Login.vue';
 import Register from '../views/Register.vue';
+import Report from '@/views/Report.vue';
 
 import { createRouter, createWebHistory } from 'vue-router';
 
@@ -26,6 +27,11 @@ const routes = [
     path: '/settings',
     name : 'Settings',
     component: Settings
+  },
+  {
+    path: '/report',
+    name: 'Report',
+    component: Report
   }
 ]
 

@@ -8,3 +8,8 @@ export const getDatetime = (taskDate) => {
 
   return datetimeValue;
 };
+// export const filterDates = (from, to) => {
+// }
+// alert('filterDates')
+// const currentDay = 
+// filterDates();

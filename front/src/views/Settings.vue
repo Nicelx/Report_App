@@ -1,34 +1,17 @@
 <script>
-// import { useExampleStore } from "@/stores";
+
 import { mapStores } from "pinia";
 
 export default {
   data() {
     return {
-      inputDate: new Date().toISOString().slice(0, 10),
+      // inputDate: new Date().toISOString().slice(0, 10),
     };
   },
   methods: {
-    getCurrentDateTime() {
-      const now = new Date();
-
-      now.setSeconds(0, 0);
-
-      return now.toISOString().slice(0, 16);
-    },
+    
   },
-  computed: {
-    formattedDate() {
-      const now = new Date();
-
-      const hours = String(now.getHours()).padStart(2, "0");
-      const minutes = String(now.getMinutes()).padStart(2, "0");
-      const datetimeValue = `${this.inputDate} ${hours}:${minutes}:00`;
-
-      return datetimeValue;
-    },
-    // ...mapStores(useExampleStore),
-  },
+  
 };
 </script>
 
@@ -40,8 +23,8 @@ export default {
     <button class="btn btn-outline">Outline</button>
   </div>
 
-  <p>{{ this.exampleStore.counter }}</p>
-  <button @click="this.exampleStore.increment()">+1</button>
+  <!-- <p>{{ this.exampleStore.counter }}</p> -->
+  <button>+1</button>
 
   <input
     class="input m1"
