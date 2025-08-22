@@ -8,8 +8,36 @@ export const getDatetime = (taskDate) => {
 
   return datetimeValue;
 };
-// export const filterDates = (from, to) => {
-// }
-// alert('filterDates')
-// const currentDay = 
-// filterDates();
+export const getWeekTimeRange = (nowDateObj) => {
+  const monday = new Date(nowDateObj);
+  monday.setDate(nowDateObj.getDate() - (nowDateObj.getDay() || 7) + 1);
+  monday.setHours(0, 0, 0, 0);
+
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  sunday.setHours(23, 59, 59, 999);
+  console.log("monday, sunday", monday, sunday);
+  return {
+    from: monday.getTime(),
+    to: sunday.getTime(),
+  };
+};
+export const isInRange = (el, from, to) => {
+  if (el > from && el < to) {
+    return true;
+  } else {
+    return false;
+  }
+};
+export const timestampToDate = (timestamp) => {
+  const date = new Date(timestamp);
+
+  const day = date.getDate();
+  const month = date.getMonth() + 1; // Месяцы начинаются с 0
+  const year = date.getFullYear();
+
+  const dayStr = day.toString().padStart(2, "0");
+  const monthStr = month.toString().padStart(2, "0");
+
+  return `${dayStr}-${monthStr}-${year}`;
+};
