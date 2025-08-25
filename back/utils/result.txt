@@ -127,13 +127,39 @@ exports.addTask = async (req, res) => {
   });
 };
 
-
 exports.updateTask = async (req, res) => {
-  console.log('updateTask');
-  return res.send({
-    message: 'task updated'
-  })
-}
+  try {
+    const updates = req.body;
+
+    await Task.updateTask({
+      ...updates,
+    });
+
+    return res.send({
+      message: "task updated",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Ошибка обновления задачи",
+    });
+  }
+};
+exports.deleteTask = async (req, res) => {
+  try {
+    const { id } = req.body;
+
+    await Task.deleteTask(id);
+
+    res.send({
+      message: "task Deleted",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message : 'удалить не получилось'
+    })
+  }
+};
+
 ********************* 
 C:\projects\Vue\malina reports\back\controllers\userController.js
 
@@ -233,11 +259,44 @@ class Task {
     }
   }
 
-  // static async updateTask({
+  static async updateTask({
+    id,
+    task_description,
+    completed_date,
+    project_id,
+    service_id,
+  }) {
+    try {
+      if (id === undefined) {
+        throw new Error("Task ID is required for update");
+      }
+      const executedStr =  `
+        update tasks
+        set
+        task_description = '${task_description}',
+        completed_date = '${completed_date}',
+        project_id = ${project_id},
+        service_id = ${service_id}
+        where id = ${id}
+      `;
+      console.log(executedStr);
+      const [result] = await pool.execute(executedStr);
+      console.log("result =", result);
+    } catch (error) {
+        throw new Error(error);
+    }
 
-  // }) {
+  }
+  static async deleteTask(taskId) {
+    if (!taskId) {
+      throw new Error('task id - false');
+    }
+    const [result] = await pool.execute(`
+        delete from tasks where id = ${taskId}
+      `)
 
-  // }
+  }
+
 
   static async getAll(user_id) {
     let query;
@@ -322,7 +381,7 @@ const User = require("./models/User");
 
 const { getUsers } = require("./controllers/userController");
 const { login } = require("./controllers/authController");
-const {addTask, updateTask} = require('./controllers/taskController');
+const {addTask, updateTask,deleteTask} = require('./controllers/taskController');
 const { getInfo, getTasks } = require("./controllers/infoController");
 
 const app = express();
@@ -334,6 +393,7 @@ app.use(express.json());
 app.get("/get-info", authMiddleware , getInfo);
 app.get("/get-tasks", authMiddleware, getTasks);
 app.put("/update-task/:id", authMiddleware, updateTask);
+app.delete('/delete-task/:id', authMiddleware, deleteTask);
 
 app.post("/login", login);
 

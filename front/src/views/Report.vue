@@ -9,10 +9,10 @@ import { useTaskStore, useControlsStore, useCoordinatorStore } from "@/stores";
 export default {
   data() {
     return {
-      now : new Date(),
+      now: new Date(),
       message: "",
-      from: '',
-      to: '',
+      from: "",
+      to: "",
     };
   },
   components: {
@@ -22,28 +22,30 @@ export default {
   computed: {
     ...mapStores(useTaskStore, useControlsStore, useCoordinatorStore),
     fromReadable() {
-      return timestampToDate(this.from)
+      return timestampToDate(this.from);
     },
     toReadable() {
-      return timestampToDate(this.to)
-    }
+      return timestampToDate(this.to);
+    },
   },
   methods: {
+    previousWeek() {
+      this.now = new Date(this.now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      this.computeDates();
+    },
+    nextWeek() {
+      this.now = new Date(this.now.getTime() + 7 * 24 * 60 * 60 * 1000);
+      this.computeDates();
+    },
     computeDates() {
-      const now = new Date();
-
-      const { from, to } = getWeekTimeRange(now);
+      const { from, to } = getWeekTimeRange(this.now);
       this.from = from;
       this.to = to;
-      console.log(from, to);
 
       const inRangeTasks = this.taskStore.tasks.filter((item) => {
         const taskTime = new Date(item.completed_date);
         return isInRange(taskTime, from, to);
       });
-
-      // console.log("in Range Tasks", inRangeTasks);
-      // console.log("task original", this.taskStore.tasks);
     },
   },
   mounted() {
@@ -62,7 +64,14 @@ export default {
     тут собираем таски за период с {{ fromReadable }} -
     {{ toReadable }}
   </p>
-  <button class = "btn btn-outline">Я оладушек откати на неделю назад</button>
-  <p></p>
-  <!-- <button @click="filterDates">sdfsdf</button> -->
+  <button @click="previousWeek()" class="btn btn-outline">
+    Я оладушек откати на неделю назад
+  </button>
+  <button @click="nextWeek()" class="btn btn-outline">
+    Следующая неделя
+  </button>
+  <p>
+    
+
+  </p>
 </template>
