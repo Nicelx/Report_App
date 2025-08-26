@@ -13,6 +13,7 @@ export default {
       message: "",
       from: "",
       to: "",
+      projectsObj: {},
     };
   },
   components: {
@@ -26,6 +27,26 @@ export default {
     },
     toReadable() {
       return timestampToDate(this.to);
+    },
+    tasksInRange() {
+      return this.taskStore.tasks.filter((item) => {
+        if (!item.completed_date) return false;
+
+        const taskTime = new Date(item.completed_date);
+        return isInRange(taskTime.getTime(), this.from, this.to);
+      });
+    },
+    reportProjects() {
+      this.projectsObj = {};
+
+      this.tasksInRange.forEach((task) => {
+        const { project_id } = task;
+        if (!this.projectsObj[project_id]) {
+          this.projectsObj[project_id] = [];
+        }
+        this.projectsObj[project_id].push(task);
+      });
+      // return obj;
     },
   },
   methods: {
@@ -41,11 +62,6 @@ export default {
       const { from, to } = getWeekTimeRange(this.now);
       this.from = from;
       this.to = to;
-
-      const inRangeTasks = this.taskStore.tasks.filter((item) => {
-        const taskTime = new Date(item.completed_date);
-        return isInRange(taskTime, from, to);
-      });
     },
   },
   mounted() {
@@ -67,11 +83,13 @@ export default {
   <button @click="previousWeek()" class="btn btn-outline">
     Я оладушек откати на неделю назад
   </button>
-  <button @click="nextWeek()" class="btn btn-outline">
-    Следующая неделя
-  </button>
-  <p>
-    
+  <button @click="nextWeek()" class="btn btn-outline">Следующая неделя</button>
 
-  </p>
+  <div class="report-list">
+    {{ reportProjects }}
+    <div v-for="projectId in Object.keys(projectsObj)" :key="projectId" class="report-item">
+      {{ projectsObj[projectId] }}
+      <hr>
+    </div>
+  </div>
 </template>

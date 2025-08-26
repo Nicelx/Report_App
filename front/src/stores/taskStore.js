@@ -105,5 +105,6 @@ export const useTaskStore = defineStore("task", {
     getTaskById(id) {
       return this.tasks.find((task) => task.id == id);
     },
+    // getTasks
   },
 });

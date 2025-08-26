@@ -16,7 +16,7 @@ export const getWeekTimeRange = (nowDateObj) => {
   const sunday = new Date(monday);
   sunday.setDate(monday.getDate() + 6);
   sunday.setHours(23, 59, 59, 999);
-  console.log("monday, sunday", monday, sunday);
+  
   return {
     from: monday.getTime(),
     to: sunday.getTime(),
