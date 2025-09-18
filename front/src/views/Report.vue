@@ -36,7 +36,25 @@ export default {
         return isInRange(taskTime.getTime(), this.from, this.to);
       });
     },
+  },
+  methods: {
+    previousWeek() {
+      this.now = new Date(this.now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      this.computeDates();
+      this.reportProjects();
+    },
+    nextWeek() {
+      this.now = new Date(this.now.getTime() + 7 * 24 * 60 * 60 * 1000);
+      this.computeDates();
+      this.reportProjects();
+    },
+    computeDates() {
+      const { from, to } = getWeekTimeRange(this.now);
+      this.from = from;
+      this.to = to;
+    },
     reportProjects() {
+      console.log("report Projects mounted");
       this.projectsObj = {};
 
       this.tasksInRange.forEach((task) => {
@@ -46,28 +64,14 @@ export default {
         }
         this.projectsObj[project_id].push(task);
       });
-      // return obj;
-    },
-  },
-  methods: {
-    previousWeek() {
-      this.now = new Date(this.now.getTime() - 7 * 24 * 60 * 60 * 1000);
-      this.computeDates();
-    },
-    nextWeek() {
-      this.now = new Date(this.now.getTime() + 7 * 24 * 60 * 60 * 1000);
-      this.computeDates();
-    },
-    computeDates() {
-      const { from, to } = getWeekTimeRange(this.now);
-      this.from = from;
-      this.to = to;
     },
   },
   mounted() {
     (async () => {
       await this.taskStore.getInfo();
+      console.log(this.taskStore.projectMap[1], 'project Map');
       await this.computeDates();
+      await this.reportProjects();
     })();
   },
 };
@@ -81,15 +85,22 @@ export default {
     {{ toReadable }}
   </p>
   <button @click="previousWeek()" class="btn btn-outline">
-    Я оладушек откати на неделю назад
+    Предыдущая неделя
   </button>
   <button @click="nextWeek()" class="btn btn-outline">Следующая неделя</button>
 
   <div class="report-list">
-    {{ reportProjects }}
-    <div v-for="projectId in Object.keys(projectsObj)" :key="projectId" class="report-item">
-      {{ projectsObj[projectId] }}
-      <hr>
+    <div
+      v-for="projectId in Object.keys(projectsObj)"
+      :key="projectId"
+      class="report-item"
+    >
+      <p>Project: {{  projectsObj[projectId] }}</p>
+      <div v-for="task in projectsObj[projectId]">
+          {{ task.task_description }}
+      </div>
+      <!-- {{ projectsObj[projectId] }} -->
+      <hr />
     </div>
   </div>
 </template>

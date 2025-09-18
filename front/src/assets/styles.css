@@ -85,7 +85,8 @@ mark,
 audio,
 video,
 input,
-select {
+select,
+textarea {
   margin: 0;
   padding: 0;
   border: 0;
@@ -147,8 +148,9 @@ body {
   font-size: 18px;
 }
 input,
-select {
-  max-width: 300px;
+select,
+textarea {
+  max-width: 400px;
 }
 
 :root {
@@ -198,6 +200,9 @@ select {
 /* #endregion */
 
 /* #region components */
+
+/* #region btns */
+
 .btn {
   display: inline-block;
   padding-inline: 24px;
@@ -254,8 +259,10 @@ select {
   background-color: var(--color-primary);
   color: var(--color-light);
 }
+/* #endregion */
 
-.input {
+/* #region .input */
+.input, textarea.input {
   display: block;
   width: 100%;
   padding: 12px 16px;
@@ -273,6 +280,9 @@ select {
   border-color: var(--color-primary);
   box-shadow: var(--glow-primary);
 }
+/* #endregion */
+
+/* #region */
 .select {
   display: block;
   width: 100%;
@@ -313,6 +323,7 @@ select {
   color: var(--color-dark);
   font-weight: 600;
 }
+/* #endregion */
 
 /* #endregion */
 
@@ -369,6 +380,8 @@ select {
 }
 
 /* #endregion */
+
+
 /* #region message component */
 .message {
   width: 300px;

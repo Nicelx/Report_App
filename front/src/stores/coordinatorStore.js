@@ -12,6 +12,7 @@ export const useCoordinatorStore = defineStore("coordinator", {
       taskStore.addTask({
         ...controls.getFormData(),
       });
+      controls.resetFields();
     },
     updateTask() {
       const taskStore = useTaskStore();
@@ -20,6 +21,7 @@ export const useCoordinatorStore = defineStore("coordinator", {
       taskStore.updateTask(controls.editId, {
         ...controls.getFormData()
       })
+      controls.resetFields();
     },
     async deleteTask() {
       const taskStore = useTaskStore();

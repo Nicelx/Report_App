@@ -20,11 +20,11 @@ export default {
 
     addNewText() {
       if (this.controlsStore.isControlsOpen) {
-        return 'Close'
+        return "Close";
       } else {
-        return 'Add new task report'
+        return "Add new task report";
       }
-    }
+    },
   },
   methods: {},
   mounted() {
@@ -39,21 +39,28 @@ export default {
 
     <p v-if="message">{{ message }}</p>
 
-    <button
-      @click="this.controlsStore.newTask"
-      class="btn btn-accent m1"
-    >
+    <button @click="this.controlsStore.newTask" class="btn btn-accent m1">
       {{ addNewText }}
     </button>
 
-    <div class="add-task-block" v-if="this.controlsStore.isControlsOpen">
-      <input
+    <div
+      id="addTaskBlock"
+      class="add-task-block"
+      v-if="this.controlsStore.isControlsOpen"
+    >
+      <!-- <input -->
+      <textarea
         class="input m1"
         v-model="this.controlsStore.taskDescription"
-        type="textarea"
         placeholder="task description"
+        rows="3"
+      ></textarea>
+
+      <input
+        class="input m1"
+        v-model="this.controlsStore.taskDate"
+        type="date"
       />
-      <input class="input m1" v-model="this.controlsStore.taskDate" type="date" />
 
       <select class="select m1" v-model="this.controlsStore.selectedProject">
         <option disabled value="">Choose project</option>
@@ -77,7 +84,13 @@ export default {
         </option>
       </select>
 
-      <button v-if="this.controlsStore.mode == 'create'" @click="this.coordinatorStore.addTask" class="btn btn-primary m1">Add new task</button>
+      <button
+        v-if="this.controlsStore.mode == 'create'"
+        @click="this.coordinatorStore.addTask"
+        class="btn btn-primary m1"
+      >
+        Add new task
+      </button>
       <button
         v-if="this.controlsStore.mode == 'edit'"
         @click="this.coordinatorStore.updateTask"
@@ -92,7 +105,13 @@ export default {
       >
         Close edititng
       </button>
-      <button v-if="this.controlsStore.mode == 'edit'" @click="this.taskStore.deleteTask(this.controlsStore.editId)" class="btn btn-secondary m1" >Delete</button>
+      <button
+        v-if="this.controlsStore.mode == 'edit'"
+        @click="this.taskStore.deleteTask(this.controlsStore.editId)"
+        class="btn btn-secondary m1"
+      >
+        Delete
+      </button>
     </div>
 
     <Tasks :tasks="this.taskStore.tasks" :projects="this.taskStore.projects" />

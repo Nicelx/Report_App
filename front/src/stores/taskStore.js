@@ -5,6 +5,7 @@ export const useTaskStore = defineStore("task", {
     tasks: [],
     projects: [],
     services: [],
+    projectMap: {}
   }),
   actions: {
     async addTask(data) {
@@ -42,6 +43,10 @@ export const useTaskStore = defineStore("task", {
       this.projects = data.projects;
       this.services = data.services;
       this.tasks = data.tasks;
+
+      this.projects.forEach((project) => {
+        this.projectMap[project.id] = project.name;
+      });
     },
 
     async updateTasks() {

@@ -46,5 +46,9 @@ export const useControlsStore = defineStore("controls", {
       this.mode = 'create';
       this.editId = null;
     },
+    resetFields() {
+      this.taskDescription = "";
+      this.taskDate = new Date().toISOString().slice(0, 10)
+    }
   },
 });

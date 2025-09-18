@@ -23,16 +23,13 @@ export default {
       const ruDate = utcDate.toLocaleDateString("ru-RU");
       return ruDate;
     },
+    edit(id) {
+      this.controlsStore.editOpen(id);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
   },
   computed: {
-    ...mapStores(useControlsStore),
-    projectMap() {
-      const map = {};
-      this.projects.forEach((project) => {
-        map[project.id] = project.name;
-      });
-      return map;
-    },
+    ...mapStores(useControlsStore, useTaskStore),
     sortedTasks() {
       return [...this.tasks].sort((a, b) => {
         return new Date(b.completed_date) - new Date(a.completed_date);
@@ -52,15 +49,12 @@ export default {
         </p>
 
         <div class="task__extra">
-          <p class="task__project">{{ projectMap[task.project_id] }}</p>
+          <p class="task__project">{{ this.taskStore.projectMap[task.project_id] }}</p>
           <p class="task__time">{{ formatDate(task.completed_date) }}</p>
         </div>
 
         <div class="task__actions">
-          <button
-            @click="this.controlsStore.editOpen(task.id)"
-            class="btn btn-accent task__edit"
-          >
+          <button @click="edit(task.id)" class="btn btn-accent task__edit">
             Edit
           </button>
         </div>
