@@ -196,6 +196,14 @@ textarea {
 .m1 {
   margin-bottom: 10px;
 }
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.red {
+  color: red;
+}
 
 /* #endregion */
 

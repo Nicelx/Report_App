@@ -2,9 +2,8 @@
 import { mapStores } from "pinia";
 import { getWeekTimeRange, isInRange, timestampToDate } from "@/utils/util";
 
-import Tasks from "@/components/Tasks.vue";
-
 import { useTaskStore, useControlsStore, useCoordinatorStore } from "@/stores";
+import ReportItem from "@/components/ReportItem.vue";
 
 export default {
   data() {
@@ -14,10 +13,11 @@ export default {
       from: "",
       to: "",
       projectsObj: {},
+      reportIndex: 0
     };
   },
   components: {
-    Tasks,
+    ReportItem,
   },
 
   computed: {
@@ -53,6 +53,7 @@ export default {
       this.from = from;
       this.to = to;
     },
+    // сортировка проектов под каждый проект с тасками
     reportProjects() {
       console.log("report Projects mounted");
       this.projectsObj = {};
@@ -64,12 +65,15 @@ export default {
         }
         this.projectsObj[project_id].push(task);
       });
+      console.log('this.projectsObj', this.projectsObj);
     },
+    sendReport() {
+      console.log('report send');
+    }
   },
   mounted() {
     (async () => {
       await this.taskStore.getInfo();
-      console.log(this.taskStore.projectMap[1], 'project Map');
       await this.computeDates();
       await this.reportProjects();
     })();
@@ -78,29 +82,32 @@ export default {
 </script>
 
 <template>
-  <h1 class="title m3">Week Report</h1>
+  <div class="wrapper">
+    <h1 class="title m3">Week Report</h1>
 
-  <p class="title-secondary m2">
-    тут собираем таски за период с {{ fromReadable }} -
-    {{ toReadable }}
-  </p>
-  <button @click="previousWeek()" class="btn btn-outline">
-    Предыдущая неделя
-  </button>
-  <button @click="nextWeek()" class="btn btn-outline">Следующая неделя</button>
-
-  <div class="report-list">
-    <div
-      v-for="projectId in Object.keys(projectsObj)"
-      :key="projectId"
-      class="report-item"
-    >
-      <p>Project: {{  projectsObj[projectId] }}</p>
-      <div v-for="task in projectsObj[projectId]">
-          {{ task.task_description }}
-      </div>
-      <!-- {{ projectsObj[projectId] }} -->
-      <hr />
+    <p class="title-secondary m2">
+      тут собираем таски за период с {{ fromReadable }} -
+      {{ toReadable }}
+    </p>
+    <div class="m2 row">
+      <button @click="previousWeek()" class="btn btn-outline">
+        Предыдущая неделя
+      </button>
+      <button @click="nextWeek()" class="btn btn-outline">
+        Следующая неделя
+      </button>
     </div>
+
+    <div class="report-list">
+      <div
+        v-for="projectId in Object.keys(projectsObj)"
+        :key="projectId"
+        class="report-item"
+      >
+        <ReportItem :tasksArray="projectsObj[projectId]" />
+        <hr />
+      </div>
+    </div>
+    <button  class="btn btn-accent" @click="sendReport">Send Report</button>
   </div>
 </template>

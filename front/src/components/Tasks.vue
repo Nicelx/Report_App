@@ -4,7 +4,6 @@ import { mapStores } from "pinia";
 import { useTaskStore, useControlsStore } from "@/stores";
 
 export default {
-  computed: {},
   props: {
     tasks: {
       type: Array,

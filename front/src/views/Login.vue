@@ -22,17 +22,14 @@ export default {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data, 'data here')
+
         localStorage.setItem("authToken", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
         this.$router.push("/");
       } else {
-        // console.error("Login failed:", await response.json());
         this.message = 'Login failed';
       }
-
-      console.log(response);
     },
   },
 };
@@ -56,16 +53,9 @@ export default {
       type="password"
       placeholder="password"
     />
-    <div class = "btns">
+    <div class = "row">
       <button @click="login" class = "btn btn-primary">Log In</button>
       <button class = "btn btn-outline"><router-link to="/register">Register</router-link></button>
     </div>
   </div>
 </template>
-
-<style scoped>
-  .btns {
-    display: flex;
-    gap: 10px;
-  }
-</style>

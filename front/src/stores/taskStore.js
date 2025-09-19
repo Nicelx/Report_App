@@ -5,9 +5,19 @@ export const useTaskStore = defineStore("task", {
     tasks: [],
     projects: [],
     services: [],
-    projectMap: {}
+    projectMap: {},
+    servicesMap: {},
   }),
   actions: {
+    generateMaps() {
+      this.projects.forEach((project) => {
+        this.projectMap[project.id] = project.name;
+      });
+      this.services.forEach((service) => {
+        this.servicesMap[service.id] = service.name;
+      });
+    },
+
     async addTask(data) {
       const token = localStorage.getItem("authToken");
       const { id: user_id } = JSON.parse(localStorage.getItem("user"));
@@ -43,10 +53,7 @@ export const useTaskStore = defineStore("task", {
       this.projects = data.projects;
       this.services = data.services;
       this.tasks = data.tasks;
-
-      this.projects.forEach((project) => {
-        this.projectMap[project.id] = project.name;
-      });
+      this.generateMaps()
     },
 
     async updateTasks() {
@@ -110,6 +117,5 @@ export const useTaskStore = defineStore("task", {
     getTaskById(id) {
       return this.tasks.find((task) => task.id == id);
     },
-    // getTasks
   },
 });

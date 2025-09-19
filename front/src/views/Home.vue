@@ -84,34 +84,36 @@ export default {
         </option>
       </select>
 
-      <button
-        v-if="this.controlsStore.mode == 'create'"
-        @click="this.coordinatorStore.addTask"
-        class="btn btn-primary m1"
-      >
-        Add new task
-      </button>
-      <button
-        v-if="this.controlsStore.mode == 'edit'"
-        @click="this.coordinatorStore.updateTask"
-        class="btn btn-primary m1"
-      >
-        Save edited task id:{{ this.controlsStore.editId }}
-      </button>
-      <button
-        v-if="this.controlsStore.mode == 'edit'"
-        @click="this.controlsStore.editClose()"
-        class="btn btn-outline m1"
-      >
-        Close edititng
-      </button>
-      <button
-        v-if="this.controlsStore.mode == 'edit'"
-        @click="this.taskStore.deleteTask(this.controlsStore.editId)"
-        class="btn btn-secondary m1"
-      >
-        Delete
-      </button>
+      <div class="row">
+        <button
+          v-if="this.controlsStore.mode == 'create'"
+          @click="this.coordinatorStore.addTask"
+          class="btn btn-primary m1"
+        >
+          Add new task
+        </button>
+        <button
+          v-if="this.controlsStore.mode == 'edit'"
+          @click="this.coordinatorStore.updateTask"
+          class="btn btn-primary m1"
+        >
+          Save edited task id:{{ this.controlsStore.editId }}
+        </button>
+        <button
+          v-if="this.controlsStore.mode == 'edit'"
+          @click="this.controlsStore.editClose()"
+          class="btn btn-outline m1"
+        >
+          Close edititng
+        </button>
+        <button
+          v-if="this.controlsStore.mode == 'edit'"
+          @click="this.taskStore.deleteTask(this.controlsStore.editId)"
+          class="btn btn-secondary m1"
+        >
+          Delete
+        </button>
+      </div>
     </div>
 
     <Tasks :tasks="this.taskStore.tasks" :projects="this.taskStore.projects" />
