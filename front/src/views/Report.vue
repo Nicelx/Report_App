@@ -2,7 +2,7 @@
 import { mapStores } from "pinia";
 import { getWeekTimeRange, isInRange, timestampToDate } from "@/utils/util";
 
-import { useTaskStore, useControlsStore, useCoordinatorStore } from "@/stores";
+import { useTaskStore, useControlsStore, useCoordinatorStore, useReportStore } from "@/stores";
 import ReportItem from "@/components/ReportItem.vue";
 
 export default {
@@ -21,7 +21,7 @@ export default {
   },
 
   computed: {
-    ...mapStores(useTaskStore, useControlsStore, useCoordinatorStore),
+    ...mapStores(useTaskStore, useControlsStore, useCoordinatorStore, useReportStore),
     fromReadable() {
       return timestampToDate(this.from);
     },
@@ -42,11 +42,15 @@ export default {
       this.now = new Date(this.now.getTime() - 7 * 24 * 60 * 60 * 1000);
       this.computeDates();
       this.reportProjects();
+
+      this.reportStore.previousWeek();
     },
     nextWeek() {
       this.now = new Date(this.now.getTime() + 7 * 24 * 60 * 60 * 1000);
       this.computeDates();
       this.reportProjects();
+
+      this.reportStore.nextWeek();
     },
     computeDates() {
       const { from, to } = getWeekTimeRange(this.now);
@@ -65,17 +69,23 @@ export default {
         }
         this.projectsObj[project_id].push(task);
       });
-      console.log('this.projectsObj', this.projectsObj);
+      // console.log('this.projectsObj', this.projectsObj);
     },
     sendReport() {
       console.log('report send');
+      console.log(this.reportStore.computeDates());
+      this.reportStore.previousWeek();
     }
   },
   mounted() {
     (async () => {
+      
       await this.taskStore.getInfo();
       await this.computeDates();
       await this.reportProjects();
+
+      // this.reportStore.computeDates();
+      // console.log(this.reportStore.from, 'from this.reportStore')
     })();
   },
 };
@@ -84,6 +94,8 @@ export default {
 <template>
   <div class="wrapper">
     <h1 class="title m3">Week Report</h1>
+
+    <button @click="this.sendReport">sdf</button>
 
     <p class="title-secondary m2">
       тут собираем таски за период с {{ fromReadable }} -
@@ -104,7 +116,7 @@ export default {
         :key="projectId"
         class="report-item"
       >
-        <ReportItem :tasksArray="projectsObj[projectId]" />
+        <!-- <ReportItem :tasksArray="projectsObj[projectId]" /> -->
         <hr />
       </div>
     </div>

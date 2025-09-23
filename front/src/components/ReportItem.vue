@@ -84,7 +84,7 @@ export default {
   },
   mounted() {
     this.initFields();
-    console.log(this.reportStore.reports);
+    // console.log(this.reportStore.reports);
   },
 };
 </script>
