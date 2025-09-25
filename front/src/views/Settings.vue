@@ -26,12 +26,12 @@ export default {
   <!-- <p>{{ this.exampleStore.counter }}</p> -->
   <button>+1</button>
 
-  <input
+  <!-- <input
     class="input m1"
     v-model="inputDate"
     type="date"
     value="formattedDate"
-  />
+  /> -->
 
   <p>
     {{ formattedDate }}

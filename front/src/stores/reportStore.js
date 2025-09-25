@@ -13,19 +13,28 @@ export const useReportStore = defineStore("report", {
     from: "",
     to: "",
     timeIndex: 0,
-    // property timeIndex and value is Objects to currentTime
     projectsObj: {},
   }),
 
   actions: {
-    updateReport(projectId, data) {
-      this.reports[projectId] = { ...this.reports[projectId], ...data };
+    fillReportsFromProjects() {
+      this.reports = {};
+
+      const projectIdsArray = Object.keys(this.projectsObj);
+      projectIdsArray.forEach((project_id) => {
+        let taskDescr = "";
+        this.projectsObj[project_id].forEach((item) => {
+          taskDescr += `- ${item.task_description} \n`;
+        });
+        this.reports[project_id] = {
+          whatDid: taskDescr,
+        };
+      });
     },
+
     computeDates() {
       const dateObj = this.dynamicNow ? this.dynamicNow : this.now;
       const { from, to } = getWeekTimeRange(dateObj);
-
-      console.log(from, to, "from-to");
 
       this.from = from;
       this.to = to;
@@ -35,32 +44,32 @@ export const useReportStore = defineStore("report", {
         this.now.getTime() + FULL_WEEK_MS * --this.timeIndex
       );
       this.computeDates();
-      // this.reportProjects();
+      this.loadProjectsForPeriod();
     },
     nextWeek() {
       this.dynamicNow = new Date(
         this.now.getTime() + FULL_WEEK_MS * ++this.timeIndex
       );
       this.computeDates();
-      // this.reportProjects();
+      this.loadProjectsForPeriod();
     },
 
-    reportProjects() {
-      console.log("report Projects mounted");
+    loadProjectsForPeriod() {
       this.projectsObj = {};
+      const tasks = this.findTasksInRange();
 
-      // this.tasksInRange.forEach((task) => {
-      //   const { project_id } = task;
-      //   if (!this.projectsObj[project_id]) {
-      //     this.projectsObj[project_id] = [];
-      //   }
-      //   this.projectsObj[project_id].push(task);
-      // });
-      // console.log('this.projectsObj', this.projectsObj);
+      tasks.forEach((task) => {
+        const { project_id } = task;
+        if (!this.projectsObj[project_id]) {
+          this.projectsObj[project_id] = [];
+        }
+        this.projectsObj[project_id].push(task);
+      });
     },
 
-    tasksInRange() {
-      return this.taskStore.tasks.filter((item) => {
+    findTasksInRange() {
+      const taskStore = useTaskStore();
+      return taskStore.tasks.filter((item) => {
         if (!item.completed_date) return false;
 
         const taskTime = new Date(item.completed_date);

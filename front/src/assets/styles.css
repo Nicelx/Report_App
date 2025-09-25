@@ -362,6 +362,7 @@ textarea {
   color: var(--color-secondary);
   font-size: 12px;
   text-shadow: 0 0 5px rgba(255, 0, 208, 0.4);
+  cursor: pointer;
 }
 
 .task__time {
