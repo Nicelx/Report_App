@@ -5,6 +5,7 @@
   <nav class = "nav m2">
     <router-link to="/">Home</router-link>
     <router-link to="/report">Report</router-link>
+    <router-link to="/projects">Projects</router-link>
     <router-link to="/login">Login</router-link>
     <router-link to="/register">Register</router-link>
     <router-link to="/settings">Settings</router-link>

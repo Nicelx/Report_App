@@ -32,6 +32,7 @@ const generate = async () => {
     "../front/src/views/Login.vue",
     "../front/src/views/Register.vue",
     "../front/src/views/Settings.vue",
+    "../front/src/views/Projects.vue",
     "../front/src/App.vue",
     "../front/src/main.js",
   ];

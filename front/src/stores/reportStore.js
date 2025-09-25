@@ -23,11 +23,18 @@ export const useReportStore = defineStore("report", {
       const projectIdsArray = Object.keys(this.projectsObj);
       projectIdsArray.forEach((project_id) => {
         let taskDescr = "";
+        let servicesId = [];
         this.projectsObj[project_id].forEach((item) => {
           taskDescr += `- ${item.task_description} \n`;
+
+          if (!servicesId.includes(item.service_id)) {
+            servicesId.push(service_id);
+          }
         });
+
         this.reports[project_id] = {
           whatDid: taskDescr,
+          servicesId,
         };
       });
     },

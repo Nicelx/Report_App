@@ -5,7 +5,7 @@ import { timestampToDate } from "@/utils/util";
 import {
   useTaskStore,
   useControlsStore,
-  useCoordinatorStore,
+  // useCoordinatorStore,
   useReportStore,
 } from "@/stores";
 import ReportItem from "@/components/ReportItem.vue";
@@ -24,7 +24,7 @@ export default {
     ...mapStores(
       useTaskStore,
       useControlsStore,
-      useCoordinatorStore,
+      // useCoordinatorStore,
       useReportStore
     ),
     fromReadable() {
@@ -38,7 +38,8 @@ export default {
     sendReport() {
       console.log("report send");
       console.log(this.reportStore.computeDates());
-      this.reportStore.previousWeek();
+      // this.reportStore.previousWeek();
+      
     },
   },
   mounted() {

@@ -72,9 +72,6 @@ export default {
 </script>
 
 <template>
-  <!-- <p class="title-secondary m2">
-     Проект: {{ this.taskStore.projectMap[this.projectId] }} 
-  </p> -->
   <button @click="toggleVisibility" class="btn btn-outline m2">
     Проект: {{ this.taskStore.projectMap[this.projectId] }} 
     {{ this.visible }}
