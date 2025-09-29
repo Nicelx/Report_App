@@ -13,6 +13,7 @@ const generate = async () => {
     "controllers/infoController.js",
     "controllers/taskController.js",
     "controllers/userController.js",
+    "controllers/reportController.js",
     "middleware/auth.js",
     "models/Project.js",
     "models/Task.js",

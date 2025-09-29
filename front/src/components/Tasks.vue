@@ -40,15 +40,12 @@ export default {
       });
     },
     filteredTasks() {
-      console.log('pf', this.projectFilter);
+      // console.log('pf', this.projectFilter);
       if (this.projectFilter == 0) return this.sortedTasks;
       return [...this.sortedTasks].filter(item => {
         return item.project_id == this.projectFilter;
       })
     },
-    // applyFilter(id) {
-    //   this.projectFilter = id;
-    // }
   },
 };
 </script>
@@ -69,7 +66,6 @@ export default {
 
 
     <div class="tasks__list">
-      <!-- <div v-for="task in sortedTasks" :key="task.id" class="task"> -->
       <div v-for="task in filteredTasks" :key="task.id" class="task">
         <p class="task__description">
           {{ task.task_description }}

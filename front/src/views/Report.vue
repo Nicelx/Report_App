@@ -64,10 +64,10 @@ export default {
       {{ toReadable }}
     </p>
     <div class="m2 row">
-      <button @click="this.reportStore.previousWeek()" class="btn btn-outline">
+      <button @click="this.reportStore.previousWeek()" class="btn btn-accent">
         Предыдущая неделя
       </button>
-      <button @click="this.reportStore.nextWeek()" class="btn btn-outline">
+      <button @click="this.reportStore.nextWeek()" class="btn btn-accent">
         Следующая неделя
       </button>
     </div>

@@ -48,7 +48,7 @@ export const useTaskStore = defineStore("task", {
         },
       });
 
-      const data = await response.json(); // предполагается, что сервер возвращает JSON
+      const data = await response.json(); 
 
       this.projects = data.projects;
       this.services = data.services;
@@ -67,7 +67,7 @@ export const useTaskStore = defineStore("task", {
         },
       });
 
-      const data = await response.json(); // предполагается, что сервер возвращает JSON
+      const data = await response.json();
 
       this.tasks = data;
     },
