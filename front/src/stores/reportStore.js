@@ -8,15 +8,73 @@ export const useReportStore = defineStore("report", {
   state: () => ({
     reports: {},
     isTouched: false,
+    isDataValid: false,
     now: new Date(),
     dynamicNow: "",
     from: "",
     to: "",
     timeIndex: 0,
     projectsObj: {},
+    statusMessage : ''
   }),
 
   actions: {
+    async sendReport() {
+      const token = localStorage.getItem("authToken");
+      const { id: user_id } = JSON.parse(localStorage.getItem("user"));
+      
+      this.validateReports();
+      if (!this.isDataValid) {
+        return 
+      }
+
+      const response = await fetch("http://localhost:3000/add-report", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id,
+          reports: this.reports,
+          start_date: this.from,
+          end_date: this.to,
+        }),
+      });
+
+      // await this.updateTasks();
+    },
+
+    validateReports() {
+      console.log(this.from, this.to);
+      
+      if (!this.from || !this.to) {
+        this.$tatusMessage = 'Ошибка периода';
+        this.isDataValid = false;
+        return;
+      }
+      // const reportsArr = Object.keys(this.reports)
+
+      for (const key in this.reports) {
+        const reportObj = this.reports[key];
+
+        if (!reportObj.how_good_are_you) {
+          this.isDataValid = false;
+          this.statusMessage = 'Не указана оценка';
+          return;
+        }
+        if (!reportObj.report_description) {
+          this.isDataValid = false;
+          this.statusMessage = 'Не заполнено обязательное поле "что сделали"';
+        }
+
+        // console.log('report Obj', reportObj);
+      }
+
+      this.statusMessage = 'validation succesful'
+      this.isDataValid = true;
+    },
+
     fillReportsFromProjects() {
       this.reports = {};
 
@@ -24,17 +82,23 @@ export const useReportStore = defineStore("report", {
       projectIdsArray.forEach((project_id) => {
         let taskDescr = "";
         let servicesId = [];
-        // this.projectsObj[project_id].forEach((item) => {
-        //   taskDescr += `- ${item.task_description} \n`;
 
-        //   if (!servicesId.includes(item.service_id)) {
-        //     servicesId.push(service_id);
-        //   }
-        // });
+        this.projectsObj[project_id].forEach((project) => {
+          taskDescr += `- ${project.task_description} \n`;
+          if (!servicesId.includes(project.service_id)) {
+            servicesId.push(project.service_id);
+          }
+        });
 
         this.reports[project_id] = {
-          whatDid: taskDescr,
-          // servicesId,
+          report_description: taskDescr,
+          service_id_array: servicesId,
+          how_good_are_you: '',
+          what_get: '',
+          conclusions: '',
+          links: '',
+          plans: '',
+          hanging: '',
         };
       });
     },
@@ -47,15 +111,16 @@ export const useReportStore = defineStore("report", {
       this.to = to;
     },
     previousWeek() {
-      this.dynamicNow = new Date(
-        this.now.getTime() + FULL_WEEK_MS * --this.timeIndex
-      );
-      this.computeDates();
-      this.loadProjectsForPeriod();
+      this.timeIndex--;
+      this.changeWeekHandler();
     },
     nextWeek() {
+      this.timeIndex++;
+      this.changeWeekHandler();
+    },
+    changeWeekHandler() {
       this.dynamicNow = new Date(
-        this.now.getTime() + FULL_WEEK_MS * ++this.timeIndex
+        this.now.getTime() + FULL_WEEK_MS * this.timeIndex
       );
       this.computeDates();
       this.loadProjectsForPeriod();
@@ -82,6 +147,9 @@ export const useReportStore = defineStore("report", {
         const taskTime = new Date(item.completed_date);
         return isInRange(taskTime.getTime(), this.from, this.to);
       });
+    },
+    touch() {
+      this.isTouched = true;
     },
   },
 });

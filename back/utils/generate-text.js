@@ -19,6 +19,7 @@ const generate = async () => {
     "models/Task.js",
     "models/User.js",
     "models/Service.js",
+    "models/Report.js",
     "index.js",
     "../front/src/components/Tasks.vue",
     "../front/src/components/ReportItem.vue",

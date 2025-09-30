@@ -14,6 +14,7 @@ export default {
   data() {
     return {
       message: "",
+      // isReportValid:false
     };
   },
   components: {
@@ -24,7 +25,6 @@ export default {
     ...mapStores(
       useTaskStore,
       useControlsStore,
-      // useCoordinatorStore,
       useReportStore
     ),
     fromReadable() {
@@ -35,11 +35,9 @@ export default {
     },
   },
   methods: {
-    sendReport() {
-      console.log("report send");
-      console.log(this.reportStore.computeDates());
-      // this.reportStore.previousWeek();
-      
+    resetFields() {
+      this.reportStore.fillReportsFromProjects();
+      this.reportStore.isTouched = false;
     },
   },
   mounted() {
@@ -50,13 +48,16 @@ export default {
     })();
   },
   beforeUpdate() {
-    this.reportStore.fillReportsFromProjects();
+    if (!this.reportStore.isTouched) {
+      this.reportStore.fillReportsFromProjects();
+    }
   },
 };
 </script>
 
 <template>
   <div class="wrapper">
+    
     <h1 class="title m3">Week Report</h1>
 
     <p class="title-secondary m2">
@@ -64,11 +65,22 @@ export default {
       {{ toReadable }}
     </p>
     <div class="m2 row">
-      <button @click="this.reportStore.previousWeek()" class="btn btn-accent">
+      <button
+        v-if="!this.reportStore.isTouched"
+        @click="this.reportStore.previousWeek()"
+        class="btn btn-accent"
+      >
         Предыдущая неделя
       </button>
-      <button @click="this.reportStore.nextWeek()" class="btn btn-accent">
+      <button
+        v-if="!this.reportStore.isTouched"
+        @click="this.reportStore.nextWeek()"
+        class="btn btn-accent"
+      >
         Следующая неделя
+      </button>
+      <button class="btn btn-accent" @click="resetFields()" v-if="this.reportStore.isTouched">
+        Reset Report
       </button>
     </div>
 
@@ -78,11 +90,12 @@ export default {
         :key="projectId"
         class="report-item m2"
       >
-        <ReportItem
-          :projectId="projectId"
-        />
+        <ReportItem :projectId="projectId" />
       </div>
     </div>
-    <button class="btn btn-accent" @click="sendReport">Send Report</button>
+    <p class = "m2" style = "color: red; font-size: 20px;">{{ this.reportStore.statusMessage }}</p>
+    <button class="btn btn-accent" @click="this.reportStore.sendReport">
+      Send Report
+    </button>
   </div>
 </template>

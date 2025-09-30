@@ -7,49 +7,30 @@ export default {
   data() {
     return {
       isVisible: true,
+      selectedService: "",
     };
   },
   props: {
     projectId: "",
   },
   methods: {
-    initFields() {
-      // const services = this.servicesStr();
-      // const whatDid = this.taskDescriptionValue();
-      // this.reportStore.updateReport(this.projectId, {
-      //   services,
-      //   whatDid,
-      //   whatGet: "",
-      //   conclusions: "",
-      //   links: "",
-      //   plans: "",
-      //   howGoodAreYou: "",
-      // });
+    firstChangeHandler() {
+      this.reportStore.touch();
     },
-    taskDescriptionValue() {
-      let str = ``;
-      this.tasksArray.forEach((task) => {
-        str += `- ${task.task_description} \n`;
-      });
-      return str;
-    },
-    // servicesStr() {
-    //   const strArr = [];
-    //   const servicesIds = [];
-    //   this.tasksArray.forEach(({ service_id }) => {
-    //     if (!servicesIds.includes(service_id)) {
-    //       servicesIds.push(service_id);
-    //     }
-    //   });
-
-    //   servicesIds.forEach((id) => {
-    //     strArr.push(this.taskStore.servicesMap[id]);
-    //   });
-
-    //   return strArr;
-    // },
     toggleVisibility() {
       this.isVisible = !this.isVisible;
+    },
+    addService() {
+      if (this.selectedService == "") {
+        return;
+      }
+      this.reportStore.reports[this.projectId].service_id_array.push(
+        this.selectedService
+      );
+      this.selectedService = "";
+    },
+    clearServices() {
+      this.reportStore.reports[this.projectId].service_id_array = [];
     },
   },
 
@@ -58,6 +39,18 @@ export default {
     currentReport() {
       return this.reportStore.reports[this.projectId] || {};
     },
+    services() {
+      return this.reportStore.reports[this.projectId].service_id_array;
+    },
+    notAddedServices() {
+      const filtered = this.taskStore.services.filter((item) => {
+        if (this.services.includes(item.id)) return false;
+        return true;
+      });
+
+      return filtered;
+    },
+
     visible() {
       if (!this.isVisible) {
         return "Расркыть";
@@ -66,29 +59,47 @@ export default {
       }
     },
   },
-  mounted() {
-  },
+  // mounted() {},
 };
 </script>
 
 <template>
   <button @click="toggleVisibility" class="btn btn-outline m2">
-    Проект: {{ this.taskStore.projectMap[this.projectId] }} 
+    Проект: {{ this.taskStore.projectMap[this.projectId] }}
     {{ this.visible }}
   </button>
   <div v-if="isVisible">
     <p class="m1"><span class="red">*</span>Услуги, по которым были работы:</p>
-    <ul class="m1">
-      <!-- <li v-for="service in services">- {{ service }}</li> -->
+    <ul class="m2">
+      <li v-for="service in services">
+        - {{ this.taskStore.servicesMap[service] }}
+      </li>
     </ul>
     <div class="row m2">
-      <button class="btn btn-primary m1">Добавить услугу</button>
-      <button class="btn btn-secondary m1">Очистить</button>
+      <!-- servicesMap -->
+      <select class="select m1" v-model="this.selectedService">
+        <option disabled value="">Choose service</option>
+        <option
+          v-for="service in notAddedServices"
+          :key="service.id"
+          :value="service.id"
+        >
+          {{ service.name }}
+        </option>
+      </select>
+      <button class="btn btn-primary m1" @click="addService">
+        Добавить услугу
+      </button>
+      <button class="btn btn-secondary m1" @click="clearServices">
+        Очистить
+      </button>
     </div>
     <p class="m1"><span class="red">*</span>Что сделали:</p>
+    <!-- v-model="this.reportStore.reports[this.projectId].report_description" -->
     <textarea
       class="input m2"
-      v-model="currentReport.whatDid"
+      v-model="currentReport.report_description"
+      @input="firstChangeHandler"
       placeholder="task description"
       rows="5"
     ></textarea>
@@ -96,7 +107,8 @@ export default {
     <p class="m1">Что получили:</p>
     <textarea
       class="input m2"
-      v-model="currentReport.whatGet"
+      v-model="currentReport.what_get"
+      @input="firstChangeHandler"
       rows="5"
     ></textarea>
 
@@ -104,6 +116,7 @@ export default {
     <textarea
       class="input m2"
       v-model="currentReport.conclusions"
+      @input="firstChangeHandler"
       rows="5"
     ></textarea>
 
@@ -111,6 +124,7 @@ export default {
     <textarea
       class="input m2"
       v-model="currentReport.links"
+      @input="firstChangeHandler"
       rows="5"
     ></textarea>
 
@@ -118,6 +132,7 @@ export default {
     <textarea
       class="input m2"
       v-model="currentReport.plans"
+      @input="firstChangeHandler"
       rows="5"
     ></textarea>
 
@@ -125,11 +140,15 @@ export default {
       <span class="red">*</span>Как вы оцениваете результаты работы по проекту
       за прошедшую неделю?:
     </p>
-    <select class="select m1" v-model="currentReport.howGoodYouAre">
+    <select
+      class="select m1"
+      v-model="currentReport.how_good_are_you"
+      @change="handleFirstChange"
+    >
       <option disabled value="">Оценка</option>
-      <option value="Отлично">Отлично</option>
-      <option value="Хорошо">Хорошо</option>
-      <option value="Плохо">Плохо</option>
+      <option value="excellent">Отлично</option>
+      <option value="good">Хорошо</option>
+      <option value="bad">Плохо</option>
     </select>
 
     <p class="m1">Зависшие моменты:</p>

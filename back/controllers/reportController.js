@@ -1,25 +1,42 @@
 // const Task = require("../models/Task");
 
 exports.addReport = async (req, res) => {
-    const {user_id, project_id, start_date, end_date, report_description, what_get, conclusion, links, plans, how_good_are_you } = req.body;
+  const {
+    user_id,
+    project_id,
+    start_date,
+    end_date,
+    report_description,
+    what_get,
+    conclusion,
+    links,
+    plans,
+    how_good_are_you,
+  } = req.body;
 
-    if (!user_id ||
-        !project_id ||
-        !start_date ||
-        !end_date ||
-        !report_description ||
-        !how_good_are_you
-    ) return res.status(500).json({
-        message: 'Не достаточно данных'
-    })
+  console.log('req.body ', req.body)
 
-    try {
-        
-    } catch (error) {
-        
-    }
-}
+//   if (
+//     !user_id ||
+//     !project_id ||
+//     !start_date ||
+//     !end_date ||
+//     !report_description ||
+//     !how_good_are_you
+//   )
+//     return res.status(500).json({
+//       message: "Не достаточно данных",
+//     });
 
+  try {
+  } catch (error) {}
+
+  return res.send({
+    message: "report added",
+  });
+};
+
+exports.updateReport = async (req, res) => {};
 // exports.addTask = async (req, res) => {
 //   console.log(req.user);
 //   const { user_id, task_description, completed_date, project_id, service_id } =
