@@ -1,20 +1,19 @@
 // const Task = require("../models/Task");
 
-exports.addReport = async (req, res) => {
+exports.addReports = async (req, res) => {
   const {
     user_id,
-    project_id,
+    // project_id,
     start_date,
     end_date,
-    report_description,
-    what_get,
-    conclusion,
-    links,
-    plans,
-    how_good_are_you,
+    reports,
+    // report_description,
+    // what_get,
+    // conclusion,
+    // links,
+    // plans,
+    // how_good_are_you,
   } = req.body;
-
-  console.log('req.body ', req.body)
 
 //   if (
 //     !user_id ||
@@ -29,6 +28,12 @@ exports.addReport = async (req, res) => {
 //     });
 
   try {
+    await Report.addReports({
+      user_id,
+      reports,
+      start_date,
+      end_date
+    })
   } catch (error) {}
 
   return res.send({

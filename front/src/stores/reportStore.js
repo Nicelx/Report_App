@@ -23,6 +23,7 @@ export const useReportStore = defineStore("report", {
       const token = localStorage.getItem("authToken");
       const { id: user_id } = JSON.parse(localStorage.getItem("user"));
       
+      // validation block
       this.validateReports();
       if (!this.isDataValid) {
         return 
@@ -53,22 +54,28 @@ export const useReportStore = defineStore("report", {
         this.isDataValid = false;
         return;
       }
-      // const reportsArr = Object.keys(this.reports)
 
       for (const key in this.reports) {
         const reportObj = this.reports[key];
 
+        // TEMP COMMENT
         if (!reportObj.how_good_are_you) {
           this.isDataValid = false;
           this.statusMessage = 'Не указана оценка';
           return;
         }
-        if (!reportObj.report_description) {
+        if (reportObj.report_description.length <= 0) {
           this.isDataValid = false;
           this.statusMessage = 'Не заполнено обязательное поле "что сделали"';
+          return;
+        }
+        if (reportObj.service_id_array.length <= 0) {
+          this.isDataValid = false;
+          this.statusMessage = 'Не указаны услуги';
+          return;
         }
 
-        // console.log('report Obj', reportObj);
+        console.log(typeof reportObj.report_description.length, 'report description');
       }
 
       this.statusMessage = 'validation succesful'
