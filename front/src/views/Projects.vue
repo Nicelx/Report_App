@@ -4,7 +4,7 @@
 
 import { mapStores } from "pinia";
 
-import { useTaskStore, useControlsStore, useCoordinatorStore } from "@/stores";
+import { useTaskStore, useControlsStore, useCoordinatorStore, useReportStore } from "@/stores";
 
 export default {
   data() {
@@ -15,9 +15,10 @@ export default {
   
   mounted() {
     this.taskStore.getInfo();
+    this.reportStore.getMyReports();
   },
   computed: {
-    ...mapStores(useTaskStore, useControlsStore, useCoordinatorStore),
+    ...mapStores(useTaskStore, useControlsStore, useCoordinatorStore, useReportStore),
   }
 };
 </script>

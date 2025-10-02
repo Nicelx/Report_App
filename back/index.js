@@ -7,7 +7,7 @@ const { createUser } = require("./controllers/userController");
 const { login } = require("./controllers/authController");
 const {addTask, updateTask,deleteTask} = require('./controllers/taskController');
 const { getInfo, getTasks } = require("./controllers/infoController");
-const { addReports } = require("./controllers/reportController");
+const { addReports, getReports } = require("./controllers/reportController");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -25,6 +25,8 @@ app.post("/login", login);
 app.post("/create-user", createUser);
 
 app.post("/add-task", authMiddleware, addTask);
+
+app.get("/reports", authMiddleware, getReports);
 app.post("/add-report", authMiddleware, addReports);
 
 app.listen(port, () => {

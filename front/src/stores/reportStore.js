@@ -15,7 +15,9 @@ export const useReportStore = defineStore("report", {
     to: "",
     timeIndex: 0,
     projectsObj: {},
-    statusMessage : ''
+    statusMessage : '',
+    loadedReports: [
+    ]
   }),
 
   actions: {
@@ -158,5 +160,25 @@ export const useReportStore = defineStore("report", {
     touch() {
       this.isTouched = true;
     },
+
+    async getMyReports() {
+      const token = localStorage.getItem("authToken");
+
+      const response = await fetch("http://localhost:3000/reports/", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json(); 
+
+      console.log(data);
+      // this.projects = data.projects;
+      // this.services = data.services;
+      // this.tasks = data.tasks;
+      // this.generateMaps()
+    }
   },
 });
