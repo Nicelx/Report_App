@@ -46,6 +46,8 @@ class Report {
       Report.addSingleReport(data, project_id);
     }
   }
+
+  // probably delete this.
   static async getMyReports(userId) {
     const sql = `
     select r.*, group_concat(rs.service_id) as service_ids
@@ -57,6 +59,38 @@ class Report {
     order by r.id;
     `;
     const [result] = await pool.execute(sql);
+    return result;
+  }
+
+  static async getReports(filters) {
+    const filterKeys = Object.keys(filters);
+    const filterLength = filterKeys.length;
+    let sqlWhere = ``;
+
+    for (let i = 0; i < filterLength; i++) {
+      let key = filterKeys[i];
+      if (filters[key] == null) continue;
+      sqlWhere += `${key} = "${filters[key]}"`;
+
+      if (i >= 0 && i < filterLength - 1) {
+        sqlWhere += " AND ";
+      }
+    }
+
+    let sql = `
+      SELECT 
+      reports.*, 
+      GROUP_CONCAT(report_services.service_id) as service_ids
+      FROM reports
+      LEFT JOIN report_services ON reports.id = report_services.report_id
+      WHERE ${sqlWhere}
+      GROUP BY reports.id
+      ORDER BY reports.start_date desc;
+    `;
+
+    console.log(sql);
+    const [result] = await pool.execute(sql);
+    console.log('result', result);
     return result;
   }
 }

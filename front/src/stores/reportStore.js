@@ -15,20 +15,19 @@ export const useReportStore = defineStore("report", {
     to: "",
     timeIndex: 0,
     projectsObj: {},
-    statusMessage : '',
-    loadedReports: [
-    ]
+    statusMessage: "",
+    loadedReports: [],
   }),
 
   actions: {
     async sendReport() {
       const token = localStorage.getItem("authToken");
       const { id: user_id } = JSON.parse(localStorage.getItem("user"));
-      
+
       // validation block
       this.validateReports();
       if (!this.isDataValid) {
-        return 
+        return;
       }
 
       const response = await fetch("http://localhost:3000/add-report", {
@@ -50,9 +49,9 @@ export const useReportStore = defineStore("report", {
 
     validateReports() {
       console.log(this.from, this.to);
-      
+
       if (!this.from || !this.to) {
-        this.$tatusMessage = 'Ошибка периода';
+        this.$tatusMessage = "Ошибка периода";
         this.isDataValid = false;
         return;
       }
@@ -63,7 +62,7 @@ export const useReportStore = defineStore("report", {
         // TEMP COMMENT
         if (!reportObj.how_good_are_you) {
           this.isDataValid = false;
-          this.statusMessage = 'Не указана оценка';
+          this.statusMessage = "Не указана оценка";
           return;
         }
         if (reportObj.report_description.length <= 0) {
@@ -73,14 +72,17 @@ export const useReportStore = defineStore("report", {
         }
         if (reportObj.service_id_array.length <= 0) {
           this.isDataValid = false;
-          this.statusMessage = 'Не указаны услуги';
+          this.statusMessage = "Не указаны услуги";
           return;
         }
 
-        console.log(typeof reportObj.report_description.length, 'report description');
+        console.log(
+          typeof reportObj.report_description.length,
+          "report description"
+        );
       }
 
-      this.statusMessage = 'validation succesful'
+      this.statusMessage = "validation succesful";
       this.isDataValid = true;
     },
 
@@ -102,12 +104,12 @@ export const useReportStore = defineStore("report", {
         this.reports[project_id] = {
           report_description: taskDescr,
           service_id_array: servicesId,
-          how_good_are_you: '',
-          what_get: '',
-          conclusions: '',
-          links: '',
-          plans: '',
-          hanging: '',
+          how_good_are_you: "",
+          what_get: "",
+          conclusions: "",
+          links: "",
+          plans: "",
+          hanging: "",
         };
       });
     },
@@ -172,13 +174,34 @@ export const useReportStore = defineStore("report", {
         },
       });
 
-      const data = await response.json(); 
+      const data = await response.json();
 
       console.log(data);
-      // this.projects = data.projects;
-      // this.services = data.services;
-      // this.tasks = data.tasks;
-      // this.generateMaps()
-    }
+    },
+    async getReports(filter) {
+      const token = localStorage.getItem("authToken");
+      let url = 'http://localhost:3000/reports/';
+      let queryStr = `?`;
+
+      for (let key in filter) {
+        queryStr += `${key}=${filter[key]}&`;
+      }
+
+      if (queryStr.length > 1) {
+        url += queryStr.slice(0, -1);
+      }
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+      this.loadedReports = [...data.result];
+      console.log(this.loadedReports);
+    },
   },
 });

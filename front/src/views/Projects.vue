@@ -1,10 +1,14 @@
 <!-- тут общая справка по проекту, плюс редактирование проектов если будет нужно -->
- <!-- подумать как хранить текст в базе данных -->
+<!-- подумать как хранить текст в базе данных -->
 <script>
-
 import { mapStores } from "pinia";
 
-import { useTaskStore, useControlsStore, useCoordinatorStore, useReportStore } from "@/stores";
+import {
+  useTaskStore,
+  useControlsStore,
+  useCoordinatorStore,
+  useReportStore,
+} from "@/stores";
 
 export default {
   data() {
@@ -12,14 +16,27 @@ export default {
       message: "",
     };
   },
-  
+
+   methods: {
+    fetchProjectReports() {
+      this.reportStore.getReports({ project_id: 2, from : this.reportStore.from, to: this.reportStore.to })
+    },
+  },
+
   mounted() {
     this.taskStore.getInfo();
-    this.reportStore.getMyReports();
+    this.reportStore.computeDates();
+    console.log(this.reportStore.from, ' ', this.reportStore.to);
+    // this.reportStore.getMyReports();
   },
   computed: {
-    ...mapStores(useTaskStore, useControlsStore, useCoordinatorStore, useReportStore),
-  }
+    ...mapStores(
+      useTaskStore,
+      useControlsStore,
+      useCoordinatorStore,
+      useReportStore
+    ),
+  },
 };
 </script>
 
@@ -29,21 +46,24 @@ export default {
 
     <p v-if="message">{{ message }}</p>
 
-
     <select class="select m1" v-model="this.controlsStore.selectedProject">
-        <option disabled value="">Choose project</option>
-        <option
-          v-for="project in this.taskStore.projects"
-          :key="project.id"
-          :value="project.id"
-        >
-          {{ project.name }}
-        </option>
-      </select>
-
-      <div>
-        тут планирую выводить информацию по проекту (отчётный период и может быть какую-нибудь информацию по проекту)
-      </div>
-
+      <option disabled value="">Choose project</option>
+      <option
+        v-for="project in this.taskStore.projects"
+        :key="project.id"
+        :value="project.id"
+      >
+        {{ project.name }}
+      </option>
+    </select>
+    <button
+      class="btn btn-accent"
+      @click="fetchProjectReports"
+    >
+      fetch
+    </button>
+    <div>
+      <ReportCard />  
+    </div>
   </div>
 </template>
