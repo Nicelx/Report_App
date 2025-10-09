@@ -64,13 +64,20 @@ class Report {
 
   static async getReports(filters) {
     const filterKeys = Object.keys(filters);
+    console.log(filterKeys);
+    console.log(filters);
     const filterLength = filterKeys.length;
     let sqlWhere = ``;
 
     for (let i = 0; i < filterLength; i++) {
       let key = filterKeys[i];
       if (filters[key] == null) continue;
-      sqlWhere += `${key} = "${filters[key]}"`;
+
+      if (key == 'start_date') {
+        sqlWhere += `${key} >= CONVERT_TZ(FROM_UNIXTIME(${filters[key] / 1000}), '+00:00', '-03:00')`
+      } else {
+        sqlWhere += `${key} = ${filters[key]}`;
+      }
 
       if (i >= 0 && i < filterLength - 1) {
         sqlWhere += " AND ";

@@ -1,4 +1,4 @@
-  const timestampToMySQLDate = require("../utils/utils");
+const timestampToMySQLDate = require("../utils/utils");
 const Report = require("../models/Report");
 
 exports.addReports = async (req, res) => {
@@ -24,22 +24,22 @@ exports.addReports = async (req, res) => {
 };
 
 exports.getReports = async (req, res) => {
-  // валидация, сбор фильтров.
-  const start_date = timestampToMySQLDate(req.query.from);
+  try {
+    const filters = {
+      project_id: req.query.project_id || null,
+      user_id: req.query.user_id || null,
+      start_date: req.query.from || null,
+    };
 
-  const filters = {
-    project_id: req.query.project_id || null,
-    user_id: req.query.user_id || null,
-    start_date : start_date || null
-    // start_date : timestampToMySQLDate(req.query.from) || null,
-  };
-  
-  const result = await Report.getReports(filters);
-  return res.send({
-    result,
-    message: "reports/",
-    userId: req.user_id,
-  });
+    const result = await Report.getReports(filters);
+    return res.send({
+      result,
+      message: "reports/",
+      userId: req.user_id,
+    });
+  } catch (error) {
+    return res.status(500).json({message: error})
+  }
 };
 
 exports.updateReport = async (req, res) => {};

@@ -9,6 +9,7 @@ import {
   useCoordinatorStore,
   useReportStore,
 } from "@/stores";
+import ReportCard from "@/components/ReportCard.vue";
 
 export default {
   data() {
@@ -17,16 +18,21 @@ export default {
     };
   },
 
-   methods: {
+  methods: {
     fetchProjectReports() {
-      this.reportStore.getReports({ project_id: 2, from : this.reportStore.from, to: this.reportStore.to })
+      this.reportStore.getReports({
+        project_id: 2,
+        from: this.reportStore.from,
+      });
     },
   },
-
+ components: {
+    ReportCard,
+  },
   mounted() {
     this.taskStore.getInfo();
     this.reportStore.computeDates();
-    console.log(this.reportStore.from, ' ', this.reportStore.to);
+    console.log(this.reportStore.from, " ", this.reportStore.to);
     // this.reportStore.getMyReports();
   },
   computed: {
@@ -56,14 +62,12 @@ export default {
         {{ project.name }}
       </option>
     </select>
-    <button
-      class="btn btn-accent"
-      @click="fetchProjectReports"
-    >
-      fetch
-    </button>
-    <div>
-      <ReportCard />  
-    </div>
+    <button class="btn btn-accent m2" @click="fetchProjectReports">fetch</button>
+      <ReportCard
+        v-for="report in this.reportStore.loadedReports"
+        :key="report.id"
+        :report-data="report"
+      />
   </div>
 </template>
+

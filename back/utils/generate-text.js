@@ -31,6 +31,7 @@ const generate = async () => {
     "../front/src/stores/taskStore.js",
     "../front/src/stores/controlsStore.js",
     "../front/src/stores/coordinatorStore.js",
+    "../front/src/stores/usersStore.js",
     "../front/src/utils/util.js",
     "../front/src/views/Home.vue",
     "../front/src/views/Login.vue",

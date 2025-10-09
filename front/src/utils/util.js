@@ -32,12 +32,23 @@ export const isInRange = (el, from, to) => {
 export const timestampToDate = (timestamp) => {
   const date = new Date(timestamp);
 
-  const day = date.getDate();
-  const month = date.getMonth() + 1; // Месяцы начинаются с 0
-  const year = date.getFullYear();
+  return buildDateStr(date);
+};
+
+export const backDateToHuman = (dateStr) => {
+  const date = new Date(dateStr);
+  date.setHours(date.getHours() + 3);
+
+  return buildDateStr(date);
+}
+
+function buildDateStr(dateObj) {
+  const day = dateObj.getDate();
+  const month = dateObj.getMonth() + 1; // Месяцы начинаются с 0
+  const year = dateObj.getFullYear();
 
   const dayStr = day.toString().padStart(2, "0");
   const monthStr = month.toString().padStart(2, "0");
 
   return `${dayStr}-${monthStr}-${year}`;
-};
+}

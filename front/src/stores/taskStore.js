@@ -1,4 +1,6 @@
 import { defineStore } from "pinia";
+import { useUsersStore } from "./usersStore";
+
 
 export const useTaskStore = defineStore("task", {
   state: () => ({
@@ -50,9 +52,12 @@ export const useTaskStore = defineStore("task", {
 
       const data = await response.json(); 
 
+      const users = useUsersStore();
+
       this.projects = data.projects;
       this.services = data.services;
       this.tasks = data.tasks;
+      users.users = ['user1', 'user2'];
       this.generateMaps()
     },
 
