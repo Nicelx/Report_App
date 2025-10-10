@@ -3,14 +3,16 @@ import { defineStore } from "pinia";
 import { useTaskStore } from "./taskStore";
 
 
-export const useUserStore = defineStore("user", {
+export const useUsersStore = defineStore("users", {
   state: () => ({
     fullName : '', // current user
-    users: [], // all users
+    users: [], // all users id, fullname, email
     user_id : '', // current user
   }),
 
   actions: {
-    
+    getUser(id) {
+      
+    }
   },
 });

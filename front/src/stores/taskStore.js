@@ -57,7 +57,7 @@ export const useTaskStore = defineStore("task", {
       this.projects = data.projects;
       this.services = data.services;
       this.tasks = data.tasks;
-      users.users = ['user1', 'user2'];
+      users.users = data.users;
       this.generateMaps()
     },
 

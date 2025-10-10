@@ -2,11 +2,13 @@ const pool = require("../config/db");
 const bcrypt = require("bcryptjs");
 
 class User {
-  static async create({ username, password }) {
+  static async createUser({ username, password }) {
     try {
+      const hashedPassword = await bcrypt.hash(password, 12);
+
       const [result] = await pool.execute(
         "INSERT INTO users (username,  password) VALUES (?, ?)",
-        [username, password]
+        [username, hashedPassword]
       );
       if (result) return result.insertId;
     } catch (error) {
@@ -15,9 +17,10 @@ class User {
   }
 
   static async getAll() {
-    const [rows] = await pool.query("SELECT id, username FROM users");
+    const [rows] = await pool.query("SELECT id, username, fullname, email FROM users");
     return rows;
   }
+
   static async findByUsername(username) {
     try {
       const [users] = await pool.execute(
@@ -29,8 +32,10 @@ class User {
   }
 
   static async comparePasswords(candidatePassword, hashedPassword) {
-    if (candidatePassword === hashedPassword) return true;
-    return false;
+    return bcrypt.compare(candidatePassword, hashedPassword);
+
+    // if (candidatePassword === hashedPassword) return true;
+    // return false;
 
     // return bcrypt.compare(candidatePassword, hashedPassword);
   }
