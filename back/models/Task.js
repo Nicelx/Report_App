@@ -31,43 +31,45 @@ class Task {
       if (id === undefined) {
         throw new Error("Task ID is required for update");
       }
-      const executedStr =  `
-        update tasks
-        set
-        task_description = '${task_description}',
-        completed_date = '${completed_date}',
-        project_id = ${project_id},
-        service_id = ${service_id}
-        where id = ${id}
-      `;
-      console.log(executedStr);
-      const [result] = await pool.execute(executedStr);
-      console.log("result =", result);
-    } catch (error) {
-        throw new Error(error);
-    }
 
+      const sql = `
+      UPDATE tasks 
+       SET task_description = ?, completed_date = ?, project_id = ?, service_id = ?
+       WHERE id = ?`;
+
+      const [result] = await pool.execute(sql, [
+        task_description,
+        completed_date,
+        project_id,
+        service_id,
+        id,
+      ]);
+    } catch (error) {
+      throw new Error(error);
+    }
   }
   static async deleteTask(taskId) {
     if (!taskId) {
-      throw new Error('task id - false');
+      throw new Error("task id - false");
     }
-    const [result] = await pool.execute(`
-        delete from tasks where id = ${taskId}
-      `)
 
+    const [result] = await pool.execute("DELETE FROM tasks WHERE id = ?", [
+      taskId,
+    ]);
   }
-
 
   static async getAll(user_id) {
     let query;
+    let params = [];
+
     if (user_id) {
-      query = `SELECT * FROM tasks where user_id = ${user_id}`;
+      query = "SELECT * FROM tasks WHERE user_id = ?";
+      params = [user_id];
     } else {
       query = `SELECT * FROM tasks`;
     }
 
-    const [rows] = await pool.query(query);
+    const [rows] = await pool.query(query, params);
     return rows;
   }
 }

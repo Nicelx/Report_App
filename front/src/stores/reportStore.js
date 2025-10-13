@@ -1,6 +1,7 @@
 import { getWeekTimeRange, isInRange } from "@/utils/util";
 import { defineStore } from "pinia";
 import { useTaskStore } from "./taskStore";
+import { fetchWithAuth } from "@/utils/api";
 
 const FULL_WEEK_MS = 604800000;
 
@@ -30,12 +31,8 @@ export const useReportStore = defineStore("report", {
         return;
       }
 
-      const response = await fetch("http://localhost:3000/add-report", {
+      const response = await fetchWithAuth("http://localhost:3000/add-report", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({
           user_id,
           reports: this.reports,
@@ -163,21 +160,21 @@ export const useReportStore = defineStore("report", {
       this.isTouched = true;
     },
 
-    async getMyReports() {
-      const token = localStorage.getItem("authToken");
+    // async getMyReports() {
+    //   const token = localStorage.getItem("authToken");
 
-      const response = await fetch("http://localhost:3000/reports/", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+    //   const response = await fetch("http://localhost:3000/reports/", {
+    //     method: "GET",
+    //     headers: {
+    //       Authorization: `Bearer ${token}`,
+    //       "Content-Type": "application/json",
+    //     },
+    //   });
 
-      const data = await response.json();
+    //   const data = await response.json();
 
-      console.log(data);
-    },
+    //   console.log(data);
+    // },
     async getReports(filter) {
       const token = localStorage.getItem("authToken");
       let url = 'http://localhost:3000/reports/';
@@ -191,17 +188,12 @@ export const useReportStore = defineStore("report", {
         url += queryStr.slice(0, -1);
       }
 
-      const response = await fetch(url, {
+      const response = await fetchWithAuth(url, {
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
       });
 
       const data = await response.json();
       this.loadedReports = [...data.result];
-      console.log(this.loadedReports);
     },
   },
 });

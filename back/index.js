@@ -4,7 +4,7 @@ require('dotenv').config();
 const authMiddleware = require('./middleware/auth');
 
 const { createUser } = require("./controllers/userController");
-const { login } = require("./controllers/authController");
+const { login, refresh } = require("./controllers/authController");
 const {addTask, updateTask,deleteTask} = require('./controllers/taskController');
 const { getInfo, getTasks } = require("./controllers/infoController");
 const { addReports, getReports } = require("./controllers/reportController");
@@ -23,6 +23,7 @@ app.delete('/delete-task/:id', authMiddleware, deleteTask);
 
 app.post("/login", login);
 app.post("/create-user", createUser);
+app.post("/refresh-token", refresh);
 
 app.post("/add-task", authMiddleware, addTask);
 

@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { useUsersStore } from "./usersStore";
+import { fetchWithAuth } from "@/utils/api";
 
 
 export const useTaskStore = defineStore("task", {
@@ -21,15 +22,10 @@ export const useTaskStore = defineStore("task", {
     },
 
     async addTask(data) {
-      const token = localStorage.getItem("authToken");
       const { id: user_id } = JSON.parse(localStorage.getItem("user"));
 
-      const response = await fetch("http://localhost:3000/add-task", {
+      const response = await fetchWithAuth("http://localhost:3000/add-task", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({
           user_id,
           ...data,
@@ -40,15 +36,7 @@ export const useTaskStore = defineStore("task", {
     },
 
     async getInfo() {
-      const token = localStorage.getItem("authToken");
-
-      const response = await fetch("http://localhost:3000/get-info", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetchWithAuth("http://localhost:3000/get-info", {method: "GET"})
 
       const data = await response.json(); 
 
@@ -62,14 +50,8 @@ export const useTaskStore = defineStore("task", {
     },
 
     async updateTasks() {
-      const token = localStorage.getItem("authToken");
-
-      const response = await fetch("http://localhost:3000/get-tasks", {
+      const response = await fetchWithAuth("http://localhost:3000/get-tasks", {
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
       });
 
       const data = await response.json();
@@ -78,16 +60,10 @@ export const useTaskStore = defineStore("task", {
     },
 
     async updateTask(taskId, taskData) {
-      const token = localStorage.getItem("authToken");
-
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `http://localhost:3000/update-task/${taskId}`,
         {
           method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
           body: JSON.stringify({
             id: taskId,
             ...taskData,
@@ -99,19 +75,14 @@ export const useTaskStore = defineStore("task", {
     },
 
     async deleteTask(taskId) {
-      const token = localStorage.getItem("authToken");
+      // const token = localStorage.getItem("authToken");
 
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `http://localhost:3000/delete-task/${taskId}`,
         {
           method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
           body: JSON.stringify({
             id: taskId,
-            message: 'lets delete it',
           }),
         }
       );

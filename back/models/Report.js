@@ -47,57 +47,42 @@ class Report {
     }
   }
 
-  // probably delete this.
-  static async getMyReports(userId) {
-    const sql = `
-    select r.*, group_concat(rs.service_id) as service_ids
-    from reports r
-    left join
-    report_services rs on r.id = rs.report_id
-    where r.user_id = ${userId}
-    group by r.id
-    order by r.id;
-    `;
-    const [result] = await pool.execute(sql);
-    return result;
-  }
-
   static async getReports(filters) {
-    const filterKeys = Object.keys(filters);
-    console.log(filterKeys);
-    console.log(filters);
-    const filterLength = filterKeys.length;
-    let sqlWhere = ``;
+    const conditions = [];
+    const values = [];
 
-    for (let i = 0; i < filterLength; i++) {
-      let key = filterKeys[i];
-      if (filters[key] == null) continue;
-
-      if (key == 'start_date') {
-        sqlWhere += `${key} >= CONVERT_TZ(FROM_UNIXTIME(${filters[key] / 1000}), '+00:00', '-03:00')`
-      } else {
-        sqlWhere += `${key} = ${filters[key]}`;
-      }
-
-      if (i >= 0 && i < filterLength - 1) {
-        sqlWhere += " AND ";
-      }
+    if (filters.project_id) {
+      conditions.push("project_id = ?");
+      values.push(filters.project_id);
     }
 
-    let sql = `
-      SELECT 
+    if (filters.user_id) {
+      conditions.push("user_id = ?");
+      values.push(filters.user_id);
+    }
+
+    if (filters.start_date) {
+      conditions.push(
+        "start_date >= CONVERT_TZ(FROM_UNIXTIME(? / 1000), '+00:00', '-03:00')"
+      );
+      values.push(filters.start_date);
+    }
+
+    const whereClause =
+      conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+    const sql = `
+    SELECT 
       reports.*, 
       GROUP_CONCAT(report_services.service_id) as service_ids
-      FROM reports
-      LEFT JOIN report_services ON reports.id = report_services.report_id
-      WHERE ${sqlWhere}
-      GROUP BY reports.id
-      ORDER BY reports.start_date desc;
-    `;
+    FROM reports
+    LEFT JOIN report_services ON reports.id = report_services.report_id
+    ${whereClause}
+    GROUP BY reports.id
+    ORDER BY reports.start_date DESC;
+  `;
 
-    console.log(sql);
-    const [result] = await pool.execute(sql);
-    console.log('result', result);
+    const [result] = await pool.execute(sql, values);
     return result;
   }
 }
