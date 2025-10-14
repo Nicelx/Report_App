@@ -3,7 +3,7 @@ import { mapStores } from "pinia";
 
 import Tasks from "@/components/Tasks.vue";
 
-import { useTaskStore, useControlsStore, useCoordinatorStore } from "@/stores";
+import { useTaskStore, useControlsStore, useCoordinatorStore, useUsersStore } from "@/stores";
 
 export default {
   data() {
@@ -16,7 +16,7 @@ export default {
   },
 
   computed: {
-    ...mapStores(useTaskStore, useControlsStore, useCoordinatorStore),
+    ...mapStores(useTaskStore, useControlsStore, useCoordinatorStore, useUsersStore),
 
     addNewText() {
       if (this.controlsStore.isControlsOpen) {
@@ -73,6 +73,7 @@ export default {
         </option>
       </select>
 
+      {{ this.taskStore.filteredServices }}
       <select class="select m1" v-model="this.controlsStore.selectedService">
         <option disabled value="">Choose service</option>
         <option

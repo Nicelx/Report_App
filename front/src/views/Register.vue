@@ -4,6 +4,7 @@ export default {
     return {
       username: "",
       password: "",
+      message: '',
     };
   },
   methods: {

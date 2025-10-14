@@ -1,7 +1,7 @@
 <script>
 import { mapStores } from "pinia";
 import { backDateToHuman } from "@/utils/util";
-import { useTaskStore } from "@/stores";
+import { useTaskStore, useUsersStore } from "@/stores";
 // console.log(backDateToHuman);
 
 export default {
@@ -24,7 +24,9 @@ export default {
     backDateToHuman,
   },
   computed: {
-    ...mapStores(useTaskStore),
+    ...mapStores(useTaskStore,
+      useUsersStore
+    ),
     services() {
       let str = '';
       const serviceArray = this.reportData.service_ids.split(',');
@@ -41,8 +43,8 @@ export default {
 
 <template>
   <div class="report-card m2">
-    <h2 class="task__time">
-      Пользователь {{ this.reportData.user_id }}<br />
+    <h2 class="task__time m1">
+      Пользователь {{this.usersStore.getUser(this.reportData.user_id).username }}<br />
       {{ backDateToHuman(this.reportData.start_date) }} до
       {{ backDateToHuman(this.reportData.end_date) }}
     </h2>

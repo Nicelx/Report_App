@@ -14,7 +14,6 @@ export async function fetchWithAuth(url, options = {}) {
   }
 
   let response = await fetch(url, config);
-  console.log('fetch with Auth')
 
   if (response.status === 401 && token) {
     try {

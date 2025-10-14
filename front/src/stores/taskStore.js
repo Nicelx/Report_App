@@ -11,6 +11,24 @@ export const useTaskStore = defineStore("task", {
     projectMap: {},
     servicesMap: {},
   }),
+
+  getters: {
+    filteredServices: (state) => {
+      const users = useUsersStore();
+
+      if (users.selectedServices.length > 0) {
+
+        // console.log(users.selectedServices);
+
+        state.services.filter(service => {
+          // console.log('service', service);
+          return users.selectedServices.includes(service.id)
+        });
+      }
+
+      return state.services;
+    }
+  },
   actions: {
     generateMaps() {
       this.projects.forEach((project) => {
@@ -35,6 +53,7 @@ export const useTaskStore = defineStore("task", {
       await this.updateTasks();
     },
 
+    // init app data
     async getInfo() {
       const response = await fetchWithAuth("http://localhost:3000/get-info", {method: "GET"})
 
@@ -46,6 +65,7 @@ export const useTaskStore = defineStore("task", {
       this.services = data.services;
       this.tasks = data.tasks;
       users.users = data.users;
+      users.setCurrentUser();
       this.generateMaps()
     },
 
