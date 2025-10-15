@@ -7,7 +7,7 @@ export default {
     return {
       fullname: "",
       email: "",
-      selectedServices: [],
+      // selectedServices: [],
     };
   },
   methods: {},
@@ -17,12 +17,6 @@ export default {
     username() {
       return this.usersStore.currentUser.username;
     },
-    // email() {
-    //   return this.usersStore.currentUser.email
-    // },
-    // fullname() {
-    //   return this.usersStore.currentUser.fullname || 'Не указано'
-    // }
     fullnameComputed() {
       return this.fullname || "Не указан";
     },
@@ -37,7 +31,10 @@ export default {
     }
     this.fullname = this.usersStore.currentUser.fullname;
     this.email = this.usersStore.currentUser.email;
-    this.selectedServices = [...this.usersStore.selectedServices]
+    // console.log('this.selectedServices mount');
+    // setTimeout(() => {
+    //   this.selectedServices = [...this.usersStore.selectedServices]
+    // }, 30)
   },
 };
 </script>
@@ -64,7 +61,7 @@ export default {
           type="checkbox"
           :id="'service_' + service.id"
           :value="service.id"
-          v-model="selectedServices"
+          v-model="this.usersStore.selectedServices"
           class="checkbox-input"
         />
         <label :for="'service_' + service.id" class="checkbox-label">
@@ -74,7 +71,7 @@ export default {
     </div>
 
     <button
-      @click="this.usersStore.updateUser({ fullname, email, selectedServices })"
+      @click="this.usersStore.updateUser({ fullname, email })"
       class="btn btn-primary btn-md"
     >
       Обновить данные
@@ -110,14 +107,5 @@ export default {
     <div class="message message--error">Ошибка</div> -->
 
 <style scoped>
-/* input[type="checkbox"] {
-  -webkit-appearance: none;
-  appearance: none;
-}
 
-input[type="checkbox"]:checked {
-}
-
-input[type="checkbox"]:disabled {
-} */
 </style>

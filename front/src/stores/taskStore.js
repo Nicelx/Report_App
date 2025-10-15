@@ -16,14 +16,12 @@ export const useTaskStore = defineStore("task", {
     filteredServices: (state) => {
       const users = useUsersStore();
 
-      if (users.selectedServices.length > 0) {
-
-        // console.log(users.selectedServices);
-
-        state.services.filter(service => {
-          // console.log('service', service);
+      if (users.selectedServices && users.selectedServices.length > 0) {
+        const filteredServices = state.services.filter(service => {
           return users.selectedServices.includes(service.id)
         });
+
+        return filteredServices;
       }
 
       return state.services;

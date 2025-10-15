@@ -77,7 +77,7 @@ export default {
       <select class="select m1" v-model="this.controlsStore.selectedService">
         <option disabled value="">Choose service</option>
         <option
-          v-for="service in this.taskStore.services"
+          v-for="service in this.taskStore.filteredServices"
           :key="service.id"
           :value="service.id"
         >

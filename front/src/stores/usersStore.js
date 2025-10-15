@@ -38,7 +38,10 @@ export const useUsersStore = defineStore("users", {
 
     loadSelected() {
       const storedServicesString = localStorage.getItem("selectedServices");
-      this.selectedServices = JSON.parse(storedServicesString);
+      if (storedServicesString) {
+        this.selectedServices = JSON.parse(storedServicesString);
+      }
+      console.log(storedServicesString, 'loadSelected()');
       // this.selectedServices.forEach(item => {
       //   console.log('item counte')
       // })
@@ -56,7 +59,7 @@ export const useUsersStore = defineStore("users", {
     },
 
     async updateUser(data) {
-      this.selectedServices = data.selectedServices;
+      // this.selectedServices = data.selectedServices;
       this.saveSelected(data.selectedServices)
 
       const response = await fetchWithAuth(
