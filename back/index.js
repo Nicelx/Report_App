@@ -3,7 +3,7 @@ const cors = require("cors");
 require('dotenv').config();
 const authMiddleware = require('./middleware/auth');
 
-const { createUser } = require("./controllers/userController");
+const { createUser, updateUser } = require("./controllers/userController");
 const { login, refresh } = require("./controllers/authController");
 const {addTask, updateTask,deleteTask} = require('./controllers/taskController');
 const { getInfo, getTasks } = require("./controllers/infoController");
@@ -23,6 +23,7 @@ app.delete('/delete-task/:id', authMiddleware, deleteTask);
 
 app.post("/login", login);
 app.post("/create-user", createUser);
+app.put('/update-user', authMiddleware, updateUser)
 app.post("/refresh-token", refresh);
 
 app.post("/add-task", authMiddleware, addTask);

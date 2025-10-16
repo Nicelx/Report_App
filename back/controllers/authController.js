@@ -61,8 +61,8 @@ exports.refresh = async (req, res) => {
     console.log('new refresh,', newRefreshToken);
 
     return res.json({
-      accessToken: newAccessToken,
-      refreshToken: newRefreshToken,
+      newAccessToken: newAccessToken,
+      newRefreshToken: newRefreshToken,
       user: {id: decoded.id, username: decoded.username}
     })
   } catch (error) {

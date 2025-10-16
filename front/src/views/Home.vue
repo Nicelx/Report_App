@@ -65,7 +65,7 @@ export default {
       <select class="select m1" v-model="this.controlsStore.selectedProject">
         <option disabled value="">Choose project</option>
         <option
-          v-for="project in this.taskStore.projects"
+          v-for="project in this.taskStore.filteredProjects"
           :key="project.id"
           :value="project.id"
         >
@@ -73,7 +73,6 @@ export default {
         </option>
       </select>
 
-      {{ this.taskStore.filteredServices }}
       <select class="select m1" v-model="this.controlsStore.selectedService">
         <option disabled value="">Choose service</option>
         <option

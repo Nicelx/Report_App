@@ -7,7 +7,6 @@ export default {
     return {
       fullname: "",
       email: "",
-      // selectedServices: [],
     };
   },
   methods: {},
@@ -23,7 +22,28 @@ export default {
     emailComputed() {
       return this.email || "Не указан";
     },
-    updateUser() {},
+    selectedServices: {
+      get() {
+        if (this.usersStore.selectedServices.length === 0) {
+          return this.taskStore.services.map((service) => service.id);
+        }
+        return this.usersStore.selectedServices;
+      },
+      set(value) {
+        this.usersStore.selectedServices = value;
+      },
+    },
+    selectedProjects: {
+      get() {
+        if (this.usersStore.selectedProjects.length === 0) {
+          return this.taskStore.projects.map((project) => project.id);
+        }
+        return this.usersStore.selectedProjects;
+      },
+      set(value) {
+        this.usersStore.selectedProjects = value;
+      },
+    },
   },
   mounted() {
     if (this.usersStore.users.length == 0) {
@@ -31,10 +51,6 @@ export default {
     }
     this.fullname = this.usersStore.currentUser.fullname;
     this.email = this.usersStore.currentUser.email;
-    // console.log('this.selectedServices mount');
-    // setTimeout(() => {
-    //   this.selectedServices = [...this.usersStore.selectedServices]
-    // }, 30)
   },
 };
 </script>
@@ -44,14 +60,13 @@ export default {
     <p class="title">{{ username }}</p>
     <p class="task__time m2">id: {{ this.usersStore.currentUser.id }}</p>
     <p>email:</p>
-    <input class="input m1" v-model="this.email" />
+    <input class="input m1" v-model="this.usersStore.currentUser.email" />
     <p>Имя:</p>
-    <input class="input m3" v-model="this.fullname" />
+    <input class="input m3" v-model="this.usersStore.currentUser.fullname" />
 
     <p class="m1">Выберите услуги, которые вы предоставляете:</p>
 
     <div class="section m3">
-      
       <div
         v-for="service in this.taskStore.services"
         :key="service.id"
@@ -61,7 +76,7 @@ export default {
           type="checkbox"
           :id="'service_' + service.id"
           :value="service.id"
-          v-model="this.usersStore.selectedServices"
+          v-model="selectedServices"
           class="checkbox-input"
         />
         <label :for="'service_' + service.id" class="checkbox-label">
@@ -70,24 +85,41 @@ export default {
       </div>
     </div>
 
+    <p class="m1">Выберите проекты, с которыми вы работаете:</p>
+    
+    <div class="section m3">
+      <div
+        v-for="project in this.taskStore.projects"
+        :key="project.id"
+        class="checkbox-item"
+      >
+        <input
+          type="checkbox"
+          :id="'project_' + project.id"
+          :value="project.id"
+          v-model="selectedProjects"
+          class="checkbox-input"
+        />
+        <label :for="'project_' + project.id" class="checkbox-label">
+          {{ project.name }}
+        </label>
+      </div>
+    </div>
+
     <button
-      @click="this.usersStore.updateUser({ fullname, email })"
+      @click="this.usersStore.updateUser()"
       class="btn btn-primary btn-md"
     >
       Обновить данные
     </button>
   </div>
 
-  <p></p>
   <div style="width: 400px; margin-top: 300px">
     <button class="btn btn-primary btn-md">Primary</button>
     <button class="btn btn-secondary">Secondary</button>
     <button class="btn btn-accent">Accent</button>
     <button class="btn btn-outline">Outline</button>
   </div>
-
-  <!-- <p>{{ this.exampleStore.counter }}</p> -->
-  <button>+1</button>
 
   <!-- <input
     class="input m1"
@@ -106,6 +138,4 @@ export default {
 
     <div class="message message--error">Ошибка</div> -->
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -25,6 +25,19 @@ export const useTaskStore = defineStore("task", {
       }
 
       return state.services;
+    },
+    filteredProjects: (state) => {
+      const users = useUsersStore();
+
+      if (users.selectedProjects && users.selectedProjects.length > 0) {
+        const filteredProjects = state.projects.filter(project => {
+          return users.selectedProjects.includes(project.id)
+        });
+
+        return filteredProjects;
+      }
+
+      return state.projects;
     }
   },
   actions: {

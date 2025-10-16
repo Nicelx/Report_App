@@ -43,7 +43,7 @@ export default {
       return this.reportStore.reports[this.projectId].service_id_array;
     },
     notAddedServices() {
-      const filtered = this.taskStore.services.filter((item) => {
+      const filtered = this.taskStore.filteredServices.filter((item) => {
         if (this.services.includes(item.id)) return false;
         return true;
       });

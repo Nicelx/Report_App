@@ -160,21 +160,6 @@ export const useReportStore = defineStore("report", {
       this.isTouched = true;
     },
 
-    // async getMyReports() {
-    //   const token = localStorage.getItem("authToken");
-
-    //   const response = await fetch("http://localhost:3000/reports/", {
-    //     method: "GET",
-    //     headers: {
-    //       Authorization: `Bearer ${token}`,
-    //       "Content-Type": "application/json",
-    //     },
-    //   });
-
-    //   const data = await response.json();
-
-    //   console.log(data);
-    // },
     async getReports(filter) {
       const token = localStorage.getItem("authToken");
       let url = 'http://localhost:3000/reports/';

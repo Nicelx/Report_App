@@ -12,12 +12,14 @@ class User {
       );
       if (result) return result.insertId;
     } catch (error) {
-      console.error('create method catch error')
+      console.error("create method catch error");
     }
   }
 
   static async getAll() {
-    const [rows] = await pool.query("SELECT id, username, fullname, email FROM users");
+    const [rows] = await pool.query(
+      "SELECT id, username, fullname, email FROM users"
+    );
     return rows;
   }
 
@@ -33,11 +35,13 @@ class User {
 
   static async comparePasswords(candidatePassword, hashedPassword) {
     return bcrypt.compare(candidatePassword, hashedPassword);
-
-    // if (candidatePassword === hashedPassword) return true;
-    // return false;
-
-    // return bcrypt.compare(candidatePassword, hashedPassword);
+  }
+  static async updateUser({ fullname, email, user_id }) {
+    const [result] = await pool.execute(
+      "UPDATE users SET fullname = ?, email = ? WHERE id = ?",
+      [fullname, email, user_id]
+    );
+    return result;
   }
 }
 

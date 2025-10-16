@@ -22,45 +22,32 @@ export const useUsersStore = defineStore("users", {
       const item = JSON.parse(localStorage.getItem("user"));
       this.currentUser = this.getUser(item.id);
       this.loadSelected();
-      console.log(this.selectedServices, 'selectedServices');
     },
 
-    saveSelected(servicesArr, projectsArr) {
-      const servicesStr = JSON.stringify(servicesArr);
+    saveSelected() {
+      const servicesStr = JSON.stringify(this.selectedServices);
       localStorage.setItem("selectedServices", servicesStr);
-      this.selectedServices = servicesArr;
 
-
-      // const projectsStr = JSON.stringify(projectsArr);
-      // localStorage.setItem("selectedProjects", projectsStr);
-      // this.selectedProjects = projectsArr;
+      const projectsStr = JSON.stringify(this.selectedProjects);
+      localStorage.setItem("selectedProjects", projectsStr);
     },
 
     loadSelected() {
       const storedServicesString = localStorage.getItem("selectedServices");
+
       if (storedServicesString) {
         this.selectedServices = JSON.parse(storedServicesString);
       }
-      console.log(storedServicesString, 'loadSelected()');
-      // this.selectedServices.forEach(item => {
-      //   console.log('item counte')
-      // })
 
-      // storedServicesString.forEach(() => {
-      //   console.log('item count2');
-      // })
+      const storedProjectsString = localStorage.getItem("selectedProjects");
 
-      // console.log(storedServicesString, '111');
-      // console.log(this.selectedServices, '222');
-      // console.log(JSON.parse(storedServicesString), 'json.parse')
-
-      // const storedProjectsString = localStorage.getItem("selectedProjects");
-      // this.selectedProjects = JSON.parse(storedProjectsString);
+      if (storedProjectsString) {
+        this.selectedProjects = JSON.parse(storedProjectsString);
+      }
     },
 
-    async updateUser(data) {
-      // this.selectedServices = data.selectedServices;
-      this.saveSelected(data.selectedServices)
+    async updateUser() {
+      this.saveSelected();
 
       const response = await fetchWithAuth(
         "http://localhost:3000/update-user",
@@ -68,7 +55,8 @@ export const useUsersStore = defineStore("users", {
           method: "PUT",
           body: JSON.stringify({
             user_id: this.currentUser.id,
-            ...data,
+            email: this.currentUser.email,
+            fullname: this.currentUser.fullname,
           }),
         }
       );

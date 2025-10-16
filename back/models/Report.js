@@ -34,16 +34,17 @@ class Report {
     ];
     console.log(data.reports[project_id].service_id_array);
     const [result] = await pool.execute(sql, values);
-    data.reports[project_id].service_id_array.forEach((service_id) => {
-      Report.addServicesToReport(result.insertId, service_id);
-    });
+    
+    for (const service_id of data.reports[project_id].service_id_array) {
+      await Report.addServicesToReport(result.insertId, service_id);
+    }
   }
   static async addReports(data) {
     data.start_date = timestampToMySQLDate(data.start_date);
     data.end_date = timestampToMySQLDate(data.end_date);
 
     for (let project_id in data.reports) {
-      Report.addSingleReport(data, project_id);
+      await Report.addSingleReport(data, project_id);
     }
   }
 
