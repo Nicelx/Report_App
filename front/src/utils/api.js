@@ -55,13 +55,10 @@ export async function refreshAuthToken() {
     }
 
     const { newAccessToken, newRefreshToken } = await response.json();
-    const data = await response.json();
     
     return {
       newAccessToken,
       newRefreshToken
-      // newAccessToken: data.newAccessToken ?? data.accessToken,
-      // newRefreshToken: data.newRefreshToken ?? data.refreshToken
     }
   } catch (error) {
     localStorage.removeItem("authToken");

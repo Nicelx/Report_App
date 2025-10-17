@@ -21,11 +21,6 @@ exports.getInfo = async (req, res) => {
   data.users = users;
 
   res.send(data);
-
-
-//   getting services
-
-
 };
 
 exports.getTasks = async (req, res) => {

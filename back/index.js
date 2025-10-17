@@ -7,7 +7,7 @@ const { createUser, updateUser } = require("./controllers/userController");
 const { login, refresh } = require("./controllers/authController");
 const {addTask, updateTask,deleteTask} = require('./controllers/taskController');
 const { getInfo, getTasks } = require("./controllers/infoController");
-const { addReports, getReports } = require("./controllers/reportController");
+const { addReport, getReports } = require("./controllers/reportController");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -29,7 +29,7 @@ app.post("/refresh-token", refresh);
 app.post("/add-task", authMiddleware, addTask);
 
 app.get("/reports", authMiddleware, getReports);
-app.post("/add-report", authMiddleware, addReports);
+app.post("/add-report", authMiddleware, addReport);
 
 app.listen(port, () => {
   console.log(`Сервер запущен на порту ${port}`);

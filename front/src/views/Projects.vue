@@ -21,7 +21,7 @@ export default {
   methods: {
     fetchProjectReports() {
       this.reportStore.getReports({
-        project_id: 3,
+        project_id: 2,
         from: this.reportStore.from,
       });
     },

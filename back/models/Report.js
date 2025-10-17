@@ -12,7 +12,12 @@ class Report {
 
     await pool.execute(sql, values);
   }
-  static async addSingleReport(data, project_id) {
+
+  static async addReport(data) {
+    data.start_date = timestampToMySQLDate(data.start_date);
+    data.end_date = timestampToMySQLDate(data.end_date);
+
+    
     const sql = `
         insert into reports
         (user_id, project_id, start_date, end_date, report_description, what_get, 
@@ -21,30 +26,23 @@ class Report {
       `;
     const values = [
       data.user_id,
-      project_id,
+      data.report.projectId,
       data.start_date,
       data.end_date,
-      data.reports[project_id].report_description,
-      data.reports[project_id].what_get,
-      data.reports[project_id].conclusions,
-      data.reports[project_id].links,
-      data.reports[project_id].plans,
-      data.reports[project_id].how_good_are_you,
-      data.reports[project_id].hanging,
+      data.report.report_description,
+      data.report.what_get,
+      data.report.conclusions,
+      data.report.links,
+      data.report.plans,
+      data.report.how_good_are_you,
+      data.report.hanging,
     ];
-    console.log(data.reports[project_id].service_id_array);
-    const [result] = await pool.execute(sql, values);
+   
     
-    for (const service_id of data.reports[project_id].service_id_array) {
-      await Report.addServicesToReport(result.insertId, service_id);
-    }
-  }
-  static async addReports(data) {
-    data.start_date = timestampToMySQLDate(data.start_date);
-    data.end_date = timestampToMySQLDate(data.end_date);
+    const [result] = await pool.execute(sql, values);
 
-    for (let project_id in data.reports) {
-      await Report.addSingleReport(data, project_id);
+    for (const service_id of data.report.service_id_array) {
+      await Report.addServicesToReport(result.insertId, service_id);
     }
   }
 

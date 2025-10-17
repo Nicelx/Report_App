@@ -6,7 +6,6 @@ import { useTaskStore, useControlsStore, useReportStore } from "@/stores";
 export default {
   data() {
     return {
-      isVisible: true,
       selectedService: "",
     };
   },
@@ -17,57 +16,48 @@ export default {
     firstChangeHandler() {
       this.reportStore.touch();
     },
-    toggleVisibility() {
-      this.isVisible = !this.isVisible;
-    },
+    // toggleVisibility() {
+    //   this.isVisible = !this.isVisible;
+    // },
     addService() {
       if (this.selectedService == "") {
         return;
       }
-      this.reportStore.reports[this.projectId].service_id_array.push(
-        this.selectedService
-      );
+      this.reportStore.report.service_id_array.push(this.selectedService);
       this.selectedService = "";
     },
     clearServices() {
-      this.reportStore.reports[this.projectId].service_id_array = [];
+      this.reportStore.report.service_id_array = [];
     },
   },
+  mounted() {},
 
   computed: {
     ...mapStores(useTaskStore, useControlsStore, useReportStore),
     currentReport() {
-      return this.reportStore.reports[this.projectId] || {};
+      return this.reportStore.report || {};
+    },
+    isVisible() {
+      return this.reportStore.report.projectId ? true : false;
     },
     services() {
-      return this.reportStore.reports[this.projectId].service_id_array;
+      return this.reportStore.report.service_id_array;
     },
     notAddedServices() {
-      const filtered = this.taskStore.filteredServices.filter((item) => {
-        if (this.services.includes(item.id)) return false;
-        return true;
-      });
+      // const filtered = this.taskStore.filteredServices.filter((item) => {
+      //   if (this.services.includes(item.id)) return false;
+      //   return true;
+      // });
 
-      return filtered;
-    },
+      // return filtered;
 
-    visible() {
-      if (!this.isVisible) {
-        return "Расркыть";
-      } else {
-        return "Скрыть";
-      }
+      return this.taskStore.services;
     },
   },
-  // mounted() {},
 };
 </script>
 
 <template>
-  <button @click="toggleVisibility" class="btn btn-outline m2">
-    Проект: {{ this.taskStore.projectMap[this.projectId] }}
-    {{ this.visible }}
-  </button>
   <div v-if="isVisible">
     <p class="m1"><span class="red">*</span>Услуги, по которым были работы:</p>
     <ul class="m2">
@@ -76,7 +66,6 @@ export default {
       </li>
     </ul>
     <div class="row m2">
-      <!-- servicesMap -->
       <select class="select m1" v-model="this.selectedService">
         <option disabled value="">Choose service</option>
         <option
@@ -95,7 +84,7 @@ export default {
       </button>
     </div>
     <p class="m1"><span class="red">*</span>Что сделали:</p>
-    <!-- v-model="this.reportStore.reports[this.projectId].report_description" -->
+
     <textarea
       class="input m2"
       v-model="currentReport.report_description"

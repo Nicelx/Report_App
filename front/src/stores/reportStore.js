@@ -7,7 +7,9 @@ const FULL_WEEK_MS = 604800000;
 
 export const useReportStore = defineStore("report", {
   state: () => ({
-    reports: {},
+    report: {},
+    tasksInRange: [],
+    projectsInRange: [], //ids here
     isTouched: false,
     isDataValid: false,
     now: new Date(),
@@ -15,100 +17,108 @@ export const useReportStore = defineStore("report", {
     from: "",
     to: "",
     timeIndex: 0,
-    projectsObj: {},
     statusMessage: "",
     loadedReports: [],
   }),
 
   actions: {
     async sendReport() {
-      const token = localStorage.getItem("authToken");
-      const { id: user_id } = JSON.parse(localStorage.getItem("user"));
-
       // validation block
-      this.validateReports();
-      if (!this.isDataValid) {
-        return;
-      }
+      // this.validateReports();
+      // if (!this.isDataValid) {
+      //   return;
+      // }
+      this.validateReport();
 
-      const response = await fetchWithAuth("http://localhost:3000/add-report", {
-        method: "POST",
-        body: JSON.stringify({
-          user_id,
-          reports: this.reports,
-          start_date: this.from,
-          end_date: this.to,
-        }),
-      });
+      const response = await fetchWithAuth(
+        "http://localhost:3000/add-report111",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            report: this.report,
+            start_date: this.from,
+            end_date: this.to,
+          }),
+        }
+      );
 
       // await this.updateTasks();
     },
 
-    validateReports() {
-      console.log(this.from, this.to);
-
+    validateReport() {
       if (!this.from || !this.to) {
-        this.$tatusMessage = "Ошибка периода";
+        this.statusMessage = "Ошибка периода";
         this.isDataValid = false;
         return;
       }
 
-      for (const key in this.reports) {
-        const reportObj = this.reports[key];
-
-        // TEMP COMMENT
-        if (!reportObj.how_good_are_you) {
-          this.isDataValid = false;
-          this.statusMessage = "Не указана оценка";
-          return;
-        }
-        if (reportObj.report_description.length <= 0) {
-          this.isDataValid = false;
-          this.statusMessage = 'Не заполнено обязательное поле "что сделали"';
-          return;
-        }
-        if (reportObj.service_id_array.length <= 0) {
-          this.isDataValid = false;
-          this.statusMessage = "Не указаны услуги";
-          return;
-        }
-
-        console.log(
-          typeof reportObj.report_description.length,
-          "report description"
-        );
-      }
-
-      this.statusMessage = "validation succesful";
       this.isDataValid = true;
     },
+    // !!!!!!!!!!!!!!
+    // REWRITE !!!
+    // validateReports() {
+    //   console.log(this.from, this.to);
 
-    fillReportsFromProjects() {
-      this.reports = {};
+    //   if (!this.from || !this.to) {
+    //     this.$tatusMessage = "Ошибка периода";
+    //     this.isDataValid = false;
+    //     return;
+    //   }
 
-      const projectIdsArray = Object.keys(this.projectsObj);
-      projectIdsArray.forEach((project_id) => {
-        let taskDescr = "";
-        let servicesId = [];
+    //   for (const key in this.reports) {
+    //     const reportObj = this.reports[key];
 
-        this.projectsObj[project_id].forEach((project) => {
-          taskDescr += `- ${project.task_description} \n`;
-          if (!servicesId.includes(project.service_id)) {
-            servicesId.push(project.service_id);
-          }
-        });
+    //     if (!reportObj.how_good_are_you) {
+    //       this.isDataValid = false;
+    //       this.statusMessage = "Не указана оценка";
+    //       return;
+    //     }
+    //     if (reportObj.report_description.length <= 0) {
+    //       this.isDataValid = false;
+    //       this.statusMessage = 'Не заполнено обязательное поле "что сделали"';
+    //       return;
+    //     }
+    //     if (reportObj.service_id_array.length <= 0) {
+    //       this.isDataValid = false;
+    //       this.statusMessage = "Не указаны услуги";
+    //       return;
+    //     }
 
-        this.reports[project_id] = {
-          report_description: taskDescr,
-          service_id_array: servicesId,
-          how_good_are_you: "",
-          what_get: "",
-          conclusions: "",
-          links: "",
-          plans: "",
-          hanging: "",
-        };
+    //     console.log(
+    //       typeof reportObj.report_description.length,
+    //       "report description"
+    //     );
+    //   }
+
+    //   this.statusMessage = "validation succesful";
+    //   this.isDataValid = true;
+    // },
+
+    fillReport(projectId) {
+      const tasksForProject = this.tasksInRange.filter(
+        (task) => task.project_id == projectId
+      );
+
+      let buildedDescr = "";
+      tasksForProject.forEach((task) => {
+        buildedDescr += `- ${task.task_description} \n`;
       });
+
+      let services_array = [
+        ...new Set(tasksForProject.map((item) => item.service_id)),
+      ];
+
+      this.report = {
+        projectId: projectId || null,
+        report_description: buildedDescr,
+        service_id_array: services_array,
+        how_good_are_you: "",
+        what_get: "",
+        conclusions: "",
+        links: "",
+        plans: "",
+        hanging: "",
+      };
     },
 
     computeDates() {
@@ -131,30 +141,23 @@ export const useReportStore = defineStore("report", {
         this.now.getTime() + FULL_WEEK_MS * this.timeIndex
       );
       this.computeDates();
-      this.loadProjectsForPeriod();
-    },
-
-    loadProjectsForPeriod() {
-      this.projectsObj = {};
-      const tasks = this.findTasksInRange();
-
-      tasks.forEach((task) => {
-        const { project_id } = task;
-        if (!this.projectsObj[project_id]) {
-          this.projectsObj[project_id] = [];
-        }
-        this.projectsObj[project_id].push(task);
-      });
+      this.findTasksInRange();
     },
 
     findTasksInRange() {
       const taskStore = useTaskStore();
-      return taskStore.tasks.filter((item) => {
+      this.tasksInRange = taskStore.tasks.filter((item) => {
         if (!item.completed_date) return false;
 
         const taskTime = new Date(item.completed_date);
-        return isInRange(taskTime.getTime(), this.from, this.to);
+        const findedTasks = isInRange(taskTime.getTime(), this.from, this.to);
+
+        return findedTasks;
       });
+      console.log("findTasksInRange triggered");
+      this.projectsInRange = [
+        ...new Set(this.tasksInRange.map((item) => item.project_id)),
+      ];
     },
     touch() {
       this.isTouched = true;
@@ -162,7 +165,7 @@ export const useReportStore = defineStore("report", {
 
     async getReports(filter) {
       const token = localStorage.getItem("authToken");
-      let url = 'http://localhost:3000/reports/';
+      let url = "http://localhost:3000/reports/";
       let queryStr = `?`;
 
       for (let key in filter) {

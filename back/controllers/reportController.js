@@ -1,8 +1,15 @@
 const timestampToMySQLDate = require("../utils/utils");
 const Report = require("../models/Report");
 
-exports.addReports = async (req, res) => {
-  const { user_id, start_date, end_date, reports } = req.body;
+exports.addReport = async (req, res) => {
+  const { start_date, end_date, report } = req.body;
+  const user_id = req.user.id;
+
+  if (!user_id) {
+    return res.status(500).json({
+      message: "Ошибка с user_id",
+    });
+  }
 
   if (
     !start_date ||
@@ -14,16 +21,17 @@ exports.addReports = async (req, res) => {
       message: "Не корректно указан промежуток. start_date or end_date",
     });
   }
-  if (!validateReports(reports)) {
+
+  if (!validateReport(report)) {
     return res.status(500).json({
-      message: "Не корректно переданы отчёты reports",
+      message: "Не корректно передан объект report",
     });
   }
 
   try {
-    await Report.addReports({
+    await Report.addReport({
       user_id,
-      reports,
+      report,
       start_date,
       end_date,
     });
@@ -60,59 +68,54 @@ exports.getReports = async (req, res) => {
 
 exports.updateReport = async (req, res) => {};
 
-const validateReports = (reportsObj) => {
-  if (Object.keys(reportsObj).length === 0) {
-    console.error("reportsObj is empty");
+const validateReport = (report) => {
+  const {
+    report_description,
+    service_id_array,
+    how_good_are_you,
+    what_get,
+    conclusions,
+    links,
+    plans,
+    hanging,
+    projectId,
+  } = report;
+
+  console.log(report);
+
+  if (
+    typeof report_description != "string" ||
+    typeof how_good_are_you != "string" ||
+    typeof service_id_array != "object" ||
+    typeof what_get != "string" ||
+    typeof conclusions != "string" ||
+    typeof links != "string" ||
+    typeof plans != "string" ||
+    typeof hanging != "string" ||
+    typeof projectId != "number"
+  ) {
+    console.error("wrong types in report object");
+    console.error(typeof report_description);
+    console.error(typeof how_good_are_you);
+    console.error(typeof service_id_array);
     return false;
   }
 
-  for (let key in obj) {
-    if (typeof key != "string") {
-      console.error("report key is not a string");
-      return false;
-    }
-    if (isNaN(key) == true) {
-      console.error("key is not numberic string");
-      return false;
-    }
-
-    const {
-      report_description,
-      service_id_array,
-      how_good_are_you,
-      what_get,
-      conclusions,
-      links,
-      plans,
-      hanging,
-    } = obj[key];
-
-    if (
-      typeof report_description != "string" ||
-      typeof how_good_are_you != "string" ||
-      typeof service_id_array != "object" ||
-      typeof what_get != "string" ||
-      typeof conclusions != "string" ||
-      typeof links != "string" ||
-      typeof plans != "string" ||
-      typeof hanging != "string"
-    ) {
-      console.error("wrong types in report object");
-      console.error(typeof report_description);
-      console.error(typeof how_good_are_you);
-      console.error(typeof service_id_array);
-      return false;
-    }
-    if (report_description.length == 0 || service_id_array.length == 0) {
-      console.error("важные поля report obj пустые");
-      console.error("report_description", report_description);
-      console.error("service_id_array", service_id_array);
-      return false;
-    }
-    if (!(how_good_are_you === 'good' || how_good_are_you === 'bad' || how_good_are_you === 'excellent')) {
-      console.error('how_good_are_you has not supported value');
-      return false;
-    }
+  if (report_description.length == 0 || service_id_array.length == 0) {
+    console.error("важные поля report obj пустые");
+    console.error("report_description", report_description);
+    console.error("service_id_array", service_id_array);
+    return false;
+  }
+  if (
+    !(
+      how_good_are_you === "good" ||
+      how_good_are_you === "bad" ||
+      how_good_are_you === "excellent"
+    )
+  ) {
+    console.error("how_good_are_you has not supported value");
+    return false;
   }
 
   return true;

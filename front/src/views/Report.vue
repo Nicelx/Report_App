@@ -2,19 +2,14 @@
 import { mapStores } from "pinia";
 import { timestampToDate } from "@/utils/util";
 
-import {
-  useTaskStore,
-  useControlsStore,
-  // useCoordinatorStore,
-  useReportStore,
-} from "@/stores";
+import { useTaskStore, useControlsStore, useReportStore } from "@/stores";
 import ReportItem from "@/components/ReportItem.vue";
 
 export default {
   data() {
     return {
       message: "",
-      // isReportValid:false
+      projectId: '',
     };
   },
   components: {
@@ -22,11 +17,7 @@ export default {
   },
 
   computed: {
-    ...mapStores(
-      useTaskStore,
-      useControlsStore,
-      useReportStore
-    ),
+    ...mapStores(useTaskStore, useControlsStore, useReportStore),
     fromReadable() {
       return timestampToDate(this.reportStore.from);
     },
@@ -35,29 +26,40 @@ export default {
     },
   },
   methods: {
-    resetFields() {
-      this.reportStore.fillReportsFromProjects();
-      this.reportStore.isTouched = false;
-    },
+
+    // REWRITE TO 1
+    // resetFields() {
+    //   this.reportStore.fillReportsFromProjects();
+    //   this.reportStore.isTouched = false;
+    // },
   },
   mounted() {
     (async () => {
       await this.taskStore.getInfo();
       this.reportStore.computeDates();
-      this.reportStore.loadProjectsForPeriod();
+      this.reportStore.findTasksInRange();
     })();
   },
   beforeUpdate() {
-    if (!this.reportStore.isTouched) {
-      this.reportStore.fillReportsFromProjects();
-    }
+    // this.reportStore.fillReport();
+    // REWRITE
+    // if (!this.reportStore.isTouched) {
+    //   this.reportStore.fillReportsFromProjects();
+    // }
   },
+  watch: {
+    projectId(newVal, oldVal) {
+      console.log('watch triggered', newVal, oldVal);
+      if (newVal && newVal !== oldVal) {
+        this.reportStore.fillReport(newVal);
+      }
+    }
+  }
 };
 </script>
 
 <template>
   <div class="wrapper">
-    
     <h1 class="title m3">Week Report</h1>
 
     <p class="title-secondary m2">
@@ -79,23 +81,52 @@ export default {
       >
         Следующая неделя
       </button>
-      <button class="btn btn-accent" @click="resetFields()" v-if="this.reportStore.isTouched">
+      <button
+        class="btn btn-accent"
+        @click="resetFields()"
+        v-if="this.reportStore.isTouched"
+      >
         Reset Report
       </button>
     </div>
 
-    <div class="report-list">
-      <div
-        v-for="projectId in Object.keys(this.reportStore.projectsObj)"
-        :key="projectId"
-        class="report-item m2"
-      >
-        <ReportItem :projectId="projectId" />
-      </div>
+    <div class = "m2">
+      Найдены задачи по следующим проектам за выбранный период:
+      <p  v-for="project in this.reportStore.projectsInRange">
+        - {{ this.taskStore.projectMap[project] }}
+      </p>
     </div>
-    <p class = "m2" style = "color: red; font-size: 20px;">{{ this.reportStore.statusMessage }}</p>
+    <div>
+      Выберите проект:
+      <select class="select m2" v-model="this.projectId">
+        <option disabled value="">Choose project</option>
+        <option
+          v-for="project in this.taskStore.filteredProjects"
+          :key="project.id"
+          :value="project.id"
+        >
+          {{ project.name }}
+        </option>
+      </select>
+    </div>
+
+    <ReportItem :projectId="projectId" />
+
+    <p class="m2" style="color: red; font-size: 20px">
+      {{ this.reportStore.statusMessage }}
+    </p>
     <button class="btn btn-accent" @click="this.reportStore.sendReport">
       Send Report
     </button>
+    <!-- <button
+      class="btn btn-accent"
+      @click="
+        () => {
+          this.reportStore.addReportToFill(3);
+        }
+      "
+    >
+      Add report to fill
+    </button> -->
   </div>
 </template>
