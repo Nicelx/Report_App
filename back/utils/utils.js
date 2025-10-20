@@ -1,3 +1,4 @@
+// save as utc time
 const timestampToMySQLDate = (timestamp) => {
   if (typeof timestamp == 'string') {
     timestamp = Number(timestamp);
@@ -9,3 +10,5 @@ const timestampToMySQLDate = (timestamp) => {
 };
 
 module.exports = timestampToMySQLDate;
+
+// 1760907600000

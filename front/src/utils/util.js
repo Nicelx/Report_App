@@ -22,6 +22,22 @@ export const getWeekTimeRange = (nowDateObj) => {
     to: sunday.getTime(),
   };
 };
+
+export const getMonthTimeRange = (nowDateObj) => {
+  const firstDay = new Date(nowDateObj.getFullYear(), nowDateObj.getMonth(), 1);
+  firstDay.setHours(0, 0, 0, 0);
+
+  const lastDay = new Date(nowDateObj.getFullYear(), nowDateObj.getMonth() + 1, 0);
+  lastDay.setHours(23, 59, 59, 999);
+  
+  return {
+    from: firstDay.getTime(),
+    to: lastDay.getTime(),
+  };
+}
+
+
+
 export const isInRange = (el, from, to) => {
   if (el > from && el < to) {
     return true;

@@ -10,7 +10,7 @@ export const useReportStore = defineStore("report", {
     report: {},
     tasksInRange: [],
     projectsInRange: [], //ids here
-    isTouched: false,
+    // isTouched: false,
     isDataValid: false,
     now: new Date(),
     dynamicNow: "",
@@ -23,76 +23,77 @@ export const useReportStore = defineStore("report", {
 
   actions: {
     async sendReport() {
-      // validation block
-      // this.validateReports();
-      // if (!this.isDataValid) {
-      //   return;
-      // }
       this.validateReport();
 
-      const response = await fetchWithAuth(
-        "http://localhost:3000/add-report111",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            report: this.report,
-            start_date: this.from,
-            end_date: this.to,
-          }),
-        }
-      );
+      if (!this.isDataValid) return;
 
-      // await this.updateTasks();
+      const response = await fetchWithAuth("http://localhost:3000/add-report", {
+        method: "POST",
+        body: JSON.stringify({
+          report: this.report,
+          start_date: this.from,
+          end_date: this.to,
+        }),
+      });
+
+      if (response.status == 200) {
+        this.statusMessage = "Отчёт отправлен";
+
+        setTimeout(() => {
+          this.statusMessage = "";
+          this.isDataValid = false;
+        }, 2000);
+        this.report = {
+          report_description: "",
+          hanging: "",
+          conclusions: "",
+          how_good_are_you: "",
+          links: "",
+          plans: "",
+          service_id_array: [],
+          what_get: "",
+        };
+      }
     },
 
     validateReport() {
+      const { how_good_are_you, report_description, service_id_array } =
+        this.report;
       if (!this.from || !this.to) {
         this.statusMessage = "Ошибка периода";
         this.isDataValid = false;
         return;
       }
 
+      if (
+        !(
+          how_good_are_you === "good" ||
+          how_good_are_you === "bad" ||
+          how_good_are_you === "excellent"
+        )
+      ) {
+        this.isDataValid = false;
+        this.statusMessage = "Не указана оценка";
+        return;
+      }
+
+      if (report_description.length <= 2) {
+        this.statusMessage = "Поле Что сделали не заполнено";
+        this.isDataValid = false;
+        return;
+      }
+
+      if (
+        typeof service_id_array !== "object" ||
+        service_id_array.length == 0
+      ) {
+        this.statusMessage = "Не указаны услуги";
+        this.isDataValid = false;
+        return;
+      }
+
       this.isDataValid = true;
     },
-    // !!!!!!!!!!!!!!
-    // REWRITE !!!
-    // validateReports() {
-    //   console.log(this.from, this.to);
-
-    //   if (!this.from || !this.to) {
-    //     this.$tatusMessage = "Ошибка периода";
-    //     this.isDataValid = false;
-    //     return;
-    //   }
-
-    //   for (const key in this.reports) {
-    //     const reportObj = this.reports[key];
-
-    //     if (!reportObj.how_good_are_you) {
-    //       this.isDataValid = false;
-    //       this.statusMessage = "Не указана оценка";
-    //       return;
-    //     }
-    //     if (reportObj.report_description.length <= 0) {
-    //       this.isDataValid = false;
-    //       this.statusMessage = 'Не заполнено обязательное поле "что сделали"';
-    //       return;
-    //     }
-    //     if (reportObj.service_id_array.length <= 0) {
-    //       this.isDataValid = false;
-    //       this.statusMessage = "Не указаны услуги";
-    //       return;
-    //     }
-
-    //     console.log(
-    //       typeof reportObj.report_description.length,
-    //       "report description"
-    //     );
-    //   }
-
-    //   this.statusMessage = "validation succesful";
-    //   this.isDataValid = true;
-    // },
 
     fillReport(projectId) {
       const tasksForProject = this.tasksInRange.filter(
@@ -154,14 +155,14 @@ export const useReportStore = defineStore("report", {
 
         return findedTasks;
       });
-      console.log("findTasksInRange triggered");
+      
       this.projectsInRange = [
         ...new Set(this.tasksInRange.map((item) => item.project_id)),
       ];
     },
-    touch() {
-      this.isTouched = true;
-    },
+    // touch() {
+    //   this.isTouched = true;
+    // },
 
     async getReports(filter) {
       const token = localStorage.getItem("authToken");

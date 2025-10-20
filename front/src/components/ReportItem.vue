@@ -85,10 +85,11 @@ export default {
     </div>
     <p class="m1"><span class="red">*</span>Что сделали:</p>
 
+<!-- @input="firstChangeHandler" -->
+
     <textarea
       class="input m2"
       v-model="currentReport.report_description"
-      @input="firstChangeHandler"
       placeholder="task description"
       rows="5"
     ></textarea>
@@ -97,7 +98,6 @@ export default {
     <textarea
       class="input m2"
       v-model="currentReport.what_get"
-      @input="firstChangeHandler"
       rows="5"
     ></textarea>
 
@@ -105,7 +105,6 @@ export default {
     <textarea
       class="input m2"
       v-model="currentReport.conclusions"
-      @input="firstChangeHandler"
       rows="5"
     ></textarea>
 
@@ -113,7 +112,6 @@ export default {
     <textarea
       class="input m2"
       v-model="currentReport.links"
-      @input="firstChangeHandler"
       rows="5"
     ></textarea>
 
@@ -121,7 +119,6 @@ export default {
     <textarea
       class="input m2"
       v-model="currentReport.plans"
-      @input="firstChangeHandler"
       rows="5"
     ></textarea>
 
@@ -132,7 +129,6 @@ export default {
     <select
       class="select m1"
       v-model="currentReport.how_good_are_you"
-      @change="handleFirstChange"
     >
       <option disabled value="">Оценка</option>
       <option value="excellent">Отлично</option>

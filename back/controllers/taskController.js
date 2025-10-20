@@ -4,6 +4,8 @@ exports.addTask = async (req, res) => {
   console.log(req.user);
   const { user_id, task_description, completed_date, project_id, service_id } =
     req.body;
+    
+  console.log(completed_date);
 
   if (
     !user_id ||

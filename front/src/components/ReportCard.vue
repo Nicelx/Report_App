@@ -91,7 +91,7 @@ export default {
       {{ this.taskStore.projectMap[this.reportData.project_id] }}
     </p>
   </div>
-  {{ this.reportData }}
+  <!-- {{ this.reportData }} -->
 </template>
 <style>
 p {

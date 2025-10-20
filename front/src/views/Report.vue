@@ -9,7 +9,9 @@ export default {
   data() {
     return {
       message: "",
-      projectId: '',
+      projectId: "",
+      from: "",
+      to: '',
     };
   },
   components: {
@@ -26,10 +28,8 @@ export default {
     },
   },
   methods: {
-
-    // REWRITE TO 1
+    
     // resetFields() {
-    //   this.reportStore.fillReportsFromProjects();
     //   this.reportStore.isTouched = false;
     // },
   },
@@ -40,21 +40,15 @@ export default {
       this.reportStore.findTasksInRange();
     })();
   },
-  beforeUpdate() {
-    // this.reportStore.fillReport();
-    // REWRITE
-    // if (!this.reportStore.isTouched) {
-    //   this.reportStore.fillReportsFromProjects();
-    // }
-  },
+  
   watch: {
     projectId(newVal, oldVal) {
-      console.log('watch triggered', newVal, oldVal);
+      console.log("watch triggered", newVal, oldVal);
       if (newVal && newVal !== oldVal) {
         this.reportStore.fillReport(newVal);
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -68,14 +62,12 @@ export default {
     </p>
     <div class="m2 row">
       <button
-        v-if="!this.reportStore.isTouched"
         @click="this.reportStore.previousWeek()"
         class="btn btn-accent"
       >
         Предыдущая неделя
       </button>
       <button
-        v-if="!this.reportStore.isTouched"
         @click="this.reportStore.nextWeek()"
         class="btn btn-accent"
       >
@@ -90,9 +82,9 @@ export default {
       </button>
     </div>
 
-    <div class = "m2">
+    <div class="m2">
       Найдены задачи по следующим проектам за выбранный период:
-      <p  v-for="project in this.reportStore.projectsInRange">
+      <p v-for="project in this.reportStore.projectsInRange">
         - {{ this.taskStore.projectMap[project] }}
       </p>
     </div>
@@ -112,7 +104,13 @@ export default {
 
     <ReportItem :projectId="projectId" />
 
-    <p class="m2" style="color: red; font-size: 20px">
+    <p
+      class="m2"
+      :style="{
+        color: this.reportStore.isDataValid ? '#00ff95' : 'red',
+        fontSize: '20px',
+      }"
+    >
       {{ this.reportStore.statusMessage }}
     </p>
     <button class="btn btn-accent" @click="this.reportStore.sendReport">

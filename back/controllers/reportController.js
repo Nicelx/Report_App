@@ -53,6 +53,7 @@ exports.getReports = async (req, res) => {
       project_id: req.query.project_id || null,
       user_id: req.query.user_id || null,
       start_date: req.query.from || null,
+      end_date: req.query.to || null,
     };
 
     const result = await Report.getReports(filters);

@@ -16,7 +16,7 @@ class Report {
   static async addReport(data) {
     data.start_date = timestampToMySQLDate(data.start_date);
     data.end_date = timestampToMySQLDate(data.end_date);
-
+    console.log('start date', data.start_date);
     
     const sql = `
         insert into reports
@@ -66,6 +66,12 @@ class Report {
       );
       values.push(filters.start_date);
     }
+    if (filters.end_date) {
+      conditions.push(
+        "end_date <= CONVERT_TZ(FROM_UNIXTIME(? / 1000), '+00:00', '-03:00')"
+      );
+      values.push(filters.end_date);
+    }
 
     const whereClause =
       conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
@@ -80,6 +86,8 @@ class Report {
     GROUP BY reports.id
     ORDER BY reports.start_date DESC;
   `;
+
+    console.log('SQL', sql);
 
     const [result] = await pool.execute(sql, values);
     return result;
