@@ -43,7 +43,8 @@ export default {
   
   watch: {
     projectId(newVal, oldVal) {
-      console.log("watch triggered", newVal, oldVal);
+      if (this.reportStore.editMode == 'edit') return;
+      // console.log("watch triggered", newVal, oldVal);
       if (newVal && newVal !== oldVal) {
         this.reportStore.fillReport(newVal);
       }
@@ -73,19 +74,19 @@ export default {
       >
         Следующая неделя
       </button>
-      <button
+      <!-- <button
         class="btn btn-accent"
         @click="resetFields()"
         v-if="this.reportStore.isTouched"
       >
         Reset Report
-      </button>
+      </button> -->
     </div>
 
     <div class="m2">
       Найдены задачи по следующим проектам за выбранный период:
       <p v-for="project in this.reportStore.projectsInRange">
-        - {{ this.taskStore.projectMap[project] }}
+        - <span class = "link" v-on:click="this.projectId = project">{{ this.taskStore.projectMap[project] }}</span>
       </p>
     </div>
     <div>
@@ -113,18 +114,16 @@ export default {
     >
       {{ this.reportStore.statusMessage }}
     </p>
-    <button class="btn btn-accent" @click="this.reportStore.sendReport">
-      Send Report
-    </button>
-    <!-- <button
-      class="btn btn-accent"
-      @click="
-        () => {
-          this.reportStore.addReportToFill(3);
-        }
-      "
-    >
-      Add report to fill
-    </button> -->
+    <div class = "row">
+      <button v-if="this.reportStore.editMode == 'add'" class="btn btn-accent" @click="this.reportStore.sendReport">
+        Send Report
+      </button>
+      <button v-if="this.reportStore.editMode == 'edit'" class="btn btn-secondary" @click="this.reportStore.updateReport">
+        Обновить отчёт
+      </button>
+      <button v-if="this.reportStore.editMode == 'edit'" class="btn btn-primary" @click="this.reportStore.toggleEdit">
+        Отменить редактирование
+      </button>
+    </div>
   </div>
 </template>

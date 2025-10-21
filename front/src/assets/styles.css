@@ -204,6 +204,13 @@ textarea {
 .red {
   color: red;
 }
+.link {
+  text-decoration: underline;
+  cursor: pointer;
+}
+.link:hover{
+  color: var(--color-primary);
+}
 
 /* #endregion */
 

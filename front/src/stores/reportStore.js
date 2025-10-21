@@ -10,7 +10,6 @@ export const useReportStore = defineStore("report", {
     report: {},
     tasksInRange: [],
     projectsInRange: [], //ids here
-    // isTouched: false,
     isDataValid: false,
     now: new Date(),
     dynamicNow: "",
@@ -19,6 +18,7 @@ export const useReportStore = defineStore("report", {
     timeIndex: 0,
     statusMessage: "",
     loadedReports: [],
+    editMode: "add", // add, edit
   }),
 
   actions: {
@@ -43,17 +43,63 @@ export const useReportStore = defineStore("report", {
           this.statusMessage = "";
           this.isDataValid = false;
         }, 2000);
-        this.report = {
-          report_description: "",
-          hanging: "",
-          conclusions: "",
-          how_good_are_you: "",
-          links: "",
-          plans: "",
-          service_id_array: [],
-          what_get: "",
-        };
+
+        this.resetReport();
       }
+    },
+
+    async updateReport() {
+      const {id} = this.report;
+      this.validateReport();
+
+      if (!this.isDataValid) return;
+
+      if (!id) {
+        this.statusMessage = "Не передан id отчёта для обновления";
+        return;
+      }
+      const response = await fetchWithAuth(`http://localhost:3000/update-report/${this.report.id}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          report: this.report,
+          start_date: this.from,
+          end_date: this.to
+        }),
+      });
+
+      if (response.status == 200) {
+        this.statusMessage = "Отчёт отправлен";
+
+        setTimeout(() => {
+          this.statusMessage = "";
+          this.isDataValid = false;
+        }, 2000);
+
+        this.resetReport();
+        this.toggleEdit();
+      }
+    },
+    toggleEdit() {
+      if (this.editMode == "edit") {
+        this.editMode = "add";
+        return;
+      }
+      if (this.editMode == "add") {
+        this.editMode = "edit";
+        return;
+      }
+    },
+    resetReport() {
+      this.report = {
+        report_description: "",
+        hanging: "",
+        conclusions: "",
+        how_good_are_you: "",
+        links: "",
+        plans: "",
+        service_id_array: [],
+        what_get: "",
+      };
     },
 
     validateReport() {
@@ -155,7 +201,7 @@ export const useReportStore = defineStore("report", {
 
         return findedTasks;
       });
-      
+
       this.projectsInRange = [
         ...new Set(this.tasksInRange.map((item) => item.project_id)),
       ];

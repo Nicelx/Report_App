@@ -16,8 +16,8 @@ class Report {
   static async addReport(data) {
     data.start_date = timestampToMySQLDate(data.start_date);
     data.end_date = timestampToMySQLDate(data.end_date);
-    console.log('start date', data.start_date);
-    
+    console.log("start date", data.start_date);
+
     const sql = `
         insert into reports
         (user_id, project_id, start_date, end_date, report_description, what_get, 
@@ -37,13 +37,84 @@ class Report {
       data.report.how_good_are_you,
       data.report.hanging,
     ];
-   
-    
+
     const [result] = await pool.execute(sql, values);
 
     for (const service_id of data.report.service_id_array) {
       await Report.addServicesToReport(result.insertId, service_id);
     }
+  }
+
+  static async updateReport( updates) {
+    const {id, user_id} = updates;
+
+    const connection = await pool.getConnection();
+    await connection.beginTransaction();
+
+    const [checkRows] = await connection.execute(
+      "SELECT id FROM reports WHERE id = ? AND user_id = ?",
+      [id, user_id]
+    );
+
+    if (checkRows.length === 0 ) {
+      await connection.rollback();
+    }
+
+
+    console.log('checkRows ', checkRows);
+
+    /*
+    
+
+      if (checkRows.length === 0) {
+        await connection.rollback();
+        throw new Error('Report not found or access denied');
+      }
+
+
+      const allowedFields = ['report_description', 'what_get', 'conclusions', 'links', 'plans', 'how_good_are_you', 'hanging', 'project_id'];
+      const fieldsToUpdate = [];
+      const values = [];
+
+      for (const field of allowedFields) {
+        if (updates.hasOwnProperty(field)) {
+          fieldsToUpdate.push(`${field} = ?`);
+          values.push(updates[field]);
+        }
+      }
+
+      if (fieldsToUpdate.length === 0) {
+        throw new Error('No fields to update');
+      }
+
+      // Добавляем updated_at
+      fieldsToUpdate.push('updated_at = NOW()');
+
+      const updateSql = `UPDATE reports SET ${fieldsToUpdate.join(', ')} WHERE id = ?`;
+      await connection.execute(updateSql, [...values, reportId]);
+
+      if (updates.service_id_array && Array.isArray(updates.service_id_array)) {
+        // Удаляем старые связи
+        await connection.execute('DELETE FROM report_services WHERE report_id = ?', [reportId]);
+        
+        // Добавляем новые
+        for (const serviceId of updates.service_id_array) {
+          await connection.execute(
+            'INSERT INTO report_services (report_id, service_id) VALUES (?, ?)',
+            [reportId, serviceId]
+          );
+        }
+      }
+
+      await connection.commit();
+      return true;
+
+
+      // await connection.rollback();
+
+      // connection.release();
+
+    */
   }
 
   static async getReports(filters) {
@@ -84,10 +155,10 @@ class Report {
     LEFT JOIN report_services ON reports.id = report_services.report_id
     ${whereClause}
     GROUP BY reports.id
-    ORDER BY reports.start_date DESC;
+    ORDER BY reports.start_date DESC, reports.updated_at DESC;
   `;
 
-    console.log('SQL', sql);
+    console.log("SQL", sql);
 
     const [result] = await pool.execute(sql, values);
     return result;

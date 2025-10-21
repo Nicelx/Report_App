@@ -1,7 +1,7 @@
 <script>
 import { mapStores } from "pinia";
 import { backDateToHuman } from "@/utils/util";
-import { useTaskStore, useUsersStore } from "@/stores";
+import { useTaskStore, useUsersStore, useReportStore } from "@/stores";
 // console.log(backDateToHuman);
 
 export default {
@@ -22,20 +22,44 @@ export default {
   },
   methods: {
     backDateToHuman,
+    editReport() {
+      this.$router.push("/report");
+
+      this.reportStore.report = {
+        report_description: this.reportData.report_description,
+        hanging: this.reportData.hanging,
+        conclusions: this.reportData.conclusions,
+        how_good_are_you: this.reportData.how_good_are_you,
+        links: this.reportData.links,
+        plans: this.reportData.plans,
+        service_id_array: this.reportData.service_ids.split(','),
+        what_get: this.reportData.what_get,
+        id: this.reportData.id,
+        projectId: this.reportData.project_id,
+      };
+      this.reportStore.toggleEdit();
+      console.log("editReport method, reportData", this.reportData);
+    },
+    closeEdit() {
+      this.reportStore.editMode = 'add';
+    }
+
   },
   computed: {
-    ...mapStores(useTaskStore,
-      useUsersStore
-    ),
+    ...mapStores(useTaskStore, useUsersStore, useReportStore),
     services() {
-      let str = '';
-      const serviceArray = this.reportData.service_ids.split(',');
+      let str = "";
+      const serviceArray = this.reportData.service_ids.split(",");
 
-      serviceArray.forEach(id => {
+      serviceArray.forEach((id) => {
         str += `-${this.taskStore.servicesMap[id]} \n`;
       });
       return str;
-    }
+    },
+    user() {
+      const user = this.usersStore.getUser(this.reportData.user_id);
+      return user.fullname ? user.fullname : user.username;
+    },
   },
   // mounted() {},
 };
@@ -44,7 +68,8 @@ export default {
 <template>
   <div class="report-card m2">
     <h2 class="task__time m1">
-      Пользователь {{this.usersStore.getUser(this.reportData.user_id).username }}<br />
+      <!-- Пользователь {{this.usersStore.getUser(this.reportData.user_id).username }}<br /> -->
+      Пользователь {{ user }}<br />
       {{ backDateToHuman(this.reportData.start_date) }} до
       {{ backDateToHuman(this.reportData.end_date) }}
     </h2>
@@ -72,7 +97,7 @@ export default {
       <p class="m2">{{ this.reportData.plans }}</p>
     </div>
 
-    <p class="task__time">Оценка работы: </p>
+    <p class="task__time">Оценка работы:</p>
     <p class="m2">{{ this.grageMap[this.reportData.how_good_are_you] }}</p>
 
     <div v-if="this.reportData.hanging">
@@ -80,22 +105,22 @@ export default {
       <p class="m2">{{ this.reportData.hanging }}</p>
     </div>
 
+    <p class="task__time">Услуги:</p>
+    <p class="m2">
+      {{ services }}
+    </p>
 
-      <p class="task__time">Услуги:</p>
-      <p class="m2">
-        {{ services }}
-      </p>
-
-
-    <p class="task__project">
+    <p class="task__project m1">
       {{ this.taskStore.projectMap[this.reportData.project_id] }}
     </p>
+
+    <button @click="editReport" class="btn btn-accent m1">Редактировать</button>
   </div>
   <!-- {{ this.reportData }} -->
 </template>
 <style>
 p {
-  white-space: pre-line
+  white-space: pre-line;
 }
 .report-card {
   border: 1px solid rgba(0, 255, 149, 0.2);

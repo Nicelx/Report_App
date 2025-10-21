@@ -13,11 +13,8 @@ export default {
     projectId: "",
   },
   methods: {
-    firstChangeHandler() {
-      this.reportStore.touch();
-    },
-    // toggleVisibility() {
-    //   this.isVisible = !this.isVisible;
+    // firstChangeHandler() {
+    //   this.reportStore.touch();
     // },
     addService() {
       if (this.selectedService == "") {
@@ -44,14 +41,12 @@ export default {
       return this.reportStore.report.service_id_array;
     },
     notAddedServices() {
-      // const filtered = this.taskStore.filteredServices.filter((item) => {
-      //   if (this.services.includes(item.id)) return false;
-      //   return true;
-      // });
-
-      // return filtered;
-
-      return this.taskStore.services;
+      const filtered = this.taskStore.filteredServices.filter(item => {
+        if (this.services.includes(item.id)) return false;
+        return true;
+      });
+      
+      return filtered
     },
   },
 };

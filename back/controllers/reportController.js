@@ -67,7 +67,25 @@ exports.getReports = async (req, res) => {
   }
 };
 
-exports.updateReport = async (req, res) => {};
+exports.updateReport = async (req, res) => {
+  console.log('update report');
+
+  // console.log(req.body);
+  // console.log(req.user);
+  const updates = {
+    ...req.body.report,
+    start_date : req.body.start_date,
+    end_date : req.body.end_date,
+    user_id : req.user.id,
+  }
+  console.log(updates, 'updates');
+
+  await Report.updateReport(updates);
+
+  return res.send({
+    message: 'report updated'
+  })
+};
 
 const validateReport = (report) => {
   const {
