@@ -43,8 +43,11 @@ export default {
   
   watch: {
     projectId(newVal, oldVal) {
-      if (this.reportStore.editMode == 'edit') return;
-      // console.log("watch triggered", newVal, oldVal);
+      if (this.reportStore.editMode == 'edit') {
+        this.reportStore.report.projectId = newVal;
+        return 
+      };  
+      //  console.log("watch triggered", newVal, oldVal);
       if (newVal && newVal !== oldVal) {
         this.reportStore.fillReport(newVal);
       }

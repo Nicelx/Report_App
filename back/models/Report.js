@@ -45,32 +45,85 @@ class Report {
     }
   }
 
-  static async updateReport( updates) {
-    const {id, user_id} = updates;
-
+  static async updateReport(updates) {
     const connection = await pool.getConnection();
-    await connection.beginTransaction();
 
-    const [checkRows] = await connection.execute(
-      "SELECT id FROM reports WHERE id = ? AND user_id = ?",
-      [id, user_id]
-    );
+    try {
+      const {
+        id,
+        user_id,
+        report_description,
+        hanging,
+        conclusions,
+        how_good_are_you,
+        links,
+        plans,
+        service_id_array,
+        what_get,
+        projectId,
+      } = updates;
+      const start_date = timestampToMySQLDate(updates.start_date);
+      const end_date = timestampToMySQLDate(updates.end_date);
 
-    if (checkRows.length === 0 ) {
-      await connection.rollback();
-    }
+      
+      await connection.beginTransaction();
 
-
-    console.log('checkRows ', checkRows);
-
-    /*
-    
+      // check user
+      const [checkRows] = await connection.execute(
+        "SELECT id FROM reports WHERE id = ? AND user_id = ?",
+        [id, user_id]
+      );
 
       if (checkRows.length === 0) {
         await connection.rollback();
-        throw new Error('Report not found or access denied');
+        throw new Error(
+          "Не найден отчёт или же пользователь не имеет прав изменять данный отчёт"
+        );
       }
 
+      // handle services
+      await connection.execute(`DELETE FROM report_services where report_id = ?`, [id]); 
+
+      for (const service_id of service_id_array) {
+        await connection.execute(`insert into report_services (report_id, service_id)
+      values(?,?) `, [id, service_id]);
+      }
+
+
+      // update report
+      const values = [
+        projectId,
+        start_date,
+        end_date,
+        report_description,
+        what_get,
+        conclusions,
+        links,
+        plans,
+        how_good_are_you,
+        hanging,
+        id
+      ];
+      const [result] = await connection.execute(
+        `
+        UPDATE reports 
+        SET project_id = ?, start_date = ?, end_date = ?, report_description = ?, what_get = ?,  conclusions = ?, links = ?, plans = ?, how_good_are_you = ?, hanging = ?, updated_at = NOW()
+        WHERE id = ?
+        `,
+        values
+      );
+      console.log('result', result);
+
+      await connection.commit();
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
+
+    /*
+    
 
       const allowedFields = ['report_description', 'what_get', 'conclusions', 'links', 'plans', 'how_good_are_you', 'hanging', 'project_id'];
       const fieldsToUpdate = [];
@@ -158,7 +211,7 @@ class Report {
     ORDER BY reports.start_date DESC, reports.updated_at DESC;
   `;
 
-    console.log("SQL", sql);
+    // console.log("SQL", sql);
 
     const [result] = await pool.execute(sql, values);
     return result;

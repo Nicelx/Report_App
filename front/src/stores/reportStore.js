@@ -49,7 +49,9 @@ export const useReportStore = defineStore("report", {
     },
 
     async updateReport() {
-      const {id} = this.report;
+      const { id } = this.report;
+
+      // !!!!! Раскомментировать позже после тестов
       this.validateReport();
 
       if (!this.isDataValid) return;
@@ -58,6 +60,7 @@ export const useReportStore = defineStore("report", {
         this.statusMessage = "Не передан id отчёта для обновления";
         return;
       }
+      
       const response = await fetchWithAuth(`http://localhost:3000/update-report/${this.report.id}`, {
         method: "PUT",
         body: JSON.stringify({
@@ -78,7 +81,17 @@ export const useReportStore = defineStore("report", {
         this.resetReport();
         this.toggleEdit();
       }
+      if (response.status == 500) {
+        console.log(response.json().message);
+
+        this.statusMessage = response.json().message;
+         setTimeout(() => {
+          this.statusMessage = "";
+          this.isDataValid = false;
+        }, 2000);
+      }
     },
+    // probably delete it later
     toggleEdit() {
       if (this.editMode == "edit") {
         this.editMode = "add";
@@ -88,6 +101,12 @@ export const useReportStore = defineStore("report", {
         this.editMode = "edit";
         return;
       }
+    },
+    setEdit() {
+      this.editMode = 'edit';
+    },
+    setAdd() {
+      this.editMode = 'add';
     },
     resetReport() {
       this.report = {
@@ -206,9 +225,7 @@ export const useReportStore = defineStore("report", {
         ...new Set(this.tasksInRange.map((item) => item.project_id)),
       ];
     },
-    // touch() {
-    //   this.isTouched = true;
-    // },
+    
 
     async getReports(filter) {
       const token = localStorage.getItem("authToken");
