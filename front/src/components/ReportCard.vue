@@ -24,6 +24,7 @@ export default {
     backDateToHuman,
     editReport() {
       this.$router.push("/report");
+      const service_id_array = this.reportData.service_ids ? this.reportData.service_ids.split(',') : [];
 
       this.reportStore.report = {
         report_description: this.reportData.report_description,
@@ -32,16 +33,25 @@ export default {
         how_good_are_you: this.reportData.how_good_are_you,
         links: this.reportData.links,
         plans: this.reportData.plans,
-        service_id_array: this.reportData.service_ids.split(','),
+        service_id_array,
         what_get: this.reportData.what_get,
         id: this.reportData.id,
         projectId: this.reportData.project_id,
       };
-      this.reportStore.toggleEdit();
+
+      this.reportStore.setEdit();
+
       console.log("editReport method, reportData", this.reportData);
     },
+    // check??
     closeEdit() {
       this.reportStore.editMode = 'add';
+    },
+     isOwner() {
+      if (this.usersStore.currentUser.id == this.reportData.user_id) {
+        return true;
+      } 
+      return false;
     }
 
   },
@@ -49,6 +59,12 @@ export default {
     ...mapStores(useTaskStore, useUsersStore, useReportStore),
     services() {
       let str = "";
+      console.log('reportDate', this.reportData);
+      if (!this.reportData.service_ids) {
+        console.error('Услуги undefined');
+        str = "Нет услуг!! Баг. Такого не должно быть"
+        return str;
+      }
       const serviceArray = this.reportData.service_ids.split(",");
 
       serviceArray.forEach((id) => {
@@ -60,8 +76,8 @@ export default {
       const user = this.usersStore.getUser(this.reportData.user_id);
       return user.fullname ? user.fullname : user.username;
     },
+   
   },
-  // mounted() {},
 };
 </script>
 
@@ -114,7 +130,7 @@ export default {
       {{ this.taskStore.projectMap[this.reportData.project_id] }}
     </p>
 
-    <button @click="editReport" class="btn btn-accent m1">Редактировать</button>
+    <button @click="editReport" v-if="isOwner()" class="btn btn-accent m1">Редактировать</button>
   </div>
   <!-- {{ this.reportData }} -->
 </template>

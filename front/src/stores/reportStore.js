@@ -51,7 +51,6 @@ export const useReportStore = defineStore("report", {
     async updateReport() {
       const { id } = this.report;
 
-      // !!!!! Раскомментировать позже после тестов
       this.validateReport();
 
       if (!this.isDataValid) return;
@@ -60,15 +59,18 @@ export const useReportStore = defineStore("report", {
         this.statusMessage = "Не передан id отчёта для обновления";
         return;
       }
-      
-      const response = await fetchWithAuth(`http://localhost:3000/update-report/${this.report.id}`, {
-        method: "PUT",
-        body: JSON.stringify({
-          report: this.report,
-          start_date: this.from,
-          end_date: this.to
-        }),
-      });
+
+      const response = await fetchWithAuth(
+        `http://localhost:3000/update-report/${this.report.id}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            report: this.report,
+            start_date: this.from,
+            end_date: this.to,
+          }),
+        }
+      );
 
       if (response.status == 200) {
         this.statusMessage = "Отчёт отправлен";
@@ -79,34 +81,84 @@ export const useReportStore = defineStore("report", {
         }, 2000);
 
         this.resetReport();
-        this.toggleEdit();
+        this.setAdd();
       }
       if (response.status == 500) {
         console.log(response.json().message);
 
         this.statusMessage = response.json().message;
-         setTimeout(() => {
+        setTimeout(() => {
           this.statusMessage = "";
           this.isDataValid = false;
         }, 2000);
       }
     },
-    // probably delete it later
-    toggleEdit() {
-      if (this.editMode == "edit") {
-        this.editMode = "add";
+
+    async deleteReport() {
+      const { id } = this.report;
+
+      if (!id) {
+        this.statusMessage = "Не передан id отчёта для обновления";
+        setTimeout(() => {
+          this.statusMessage = "";
+          this.isDataValid = false;
+        }, 2000);
         return;
       }
-      if (this.editMode == "add") {
-        this.editMode = "edit";
-        return;
+
+      const response = await fetchWithAuth(
+        `http://localhost:3000/delete-report/${this.report.id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (response.status == 200) {
+        this.setAdd();
+        this.statusMessage = "Отчёт удалён=(";
+
+        setTimeout(() => {
+          this.statusMessage = "";
+          this.isDataValid = false;
+          this.$router.push("/projects");
+        }, 2000);
       }
+      if (response.status == 500) {
+        const data = await response.json(); 
+        this.statusMessage = data.message;
+
+        setTimeout(() => {
+          this.statusMessage = "";
+          this.isDataValid = false;
+        }, 2000);
+      }
+    },
+
+    async getReports(filter) {
+      const token = localStorage.getItem("authToken");
+      let url = "http://localhost:3000/reports/";
+      let queryStr = `?`;
+
+      for (let key in filter) {
+        queryStr += `${key}=${filter[key]}&`;
+      }
+
+      if (queryStr.length > 1) {
+        url += queryStr.slice(0, -1);
+      }
+
+      const response = await fetchWithAuth(url, {
+        method: "GET",
+      });
+
+      const data = await response.json();
+      this.loadedReports = [...data.result];
     },
     setEdit() {
-      this.editMode = 'edit';
+      this.editMode = "edit";
     },
     setAdd() {
-      this.editMode = 'add';
+      this.editMode = "add";
     },
     resetReport() {
       this.report = {
@@ -224,28 +276,6 @@ export const useReportStore = defineStore("report", {
       this.projectsInRange = [
         ...new Set(this.tasksInRange.map((item) => item.project_id)),
       ];
-    },
-    
-
-    async getReports(filter) {
-      const token = localStorage.getItem("authToken");
-      let url = "http://localhost:3000/reports/";
-      let queryStr = `?`;
-
-      for (let key in filter) {
-        queryStr += `${key}=${filter[key]}&`;
-      }
-
-      if (queryStr.length > 1) {
-        url += queryStr.slice(0, -1);
-      }
-
-      const response = await fetchWithAuth(url, {
-        method: "GET",
-      });
-
-      const data = await response.json();
-      this.loadedReports = [...data.result];
     },
   },
 });

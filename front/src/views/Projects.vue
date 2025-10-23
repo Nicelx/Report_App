@@ -17,7 +17,7 @@ export default {
   data() {
     return {
       message: "",
-      projectId: "",
+      projectId: null,
       selectedPeriod: "",
       selectedUser: "",
       from: "",
@@ -56,15 +56,16 @@ export default {
       }
     },
     onUserChange() {
-      console.log("onUserChange()");
-      if (this.projectId) {
+      // console.log("onUserChange()");
+      // if (this.projectId) {
         this.fetchProjectReports();
-      }
+      // }
     },
     fetchProjectReports() {
-      const filters = {
-        project_id: this.projectId,
-      };
+      const filters = {};
+      if (this.projectId) {
+        filters.project_id = this.projectId;
+      }
 
       if (this.from) {
         filters.from = this.from;
@@ -86,17 +87,17 @@ export default {
   },
   watch: {
     projectId(newProjectId) {
-      if (newProjectId) {
+      // if (newProjectId) {
         this.fetchProjectReports();
-      }
+      // }
     },
     from(newFrom) {
-      if (this.projectId) {
+      // if (this.projectId) {
         this.fetchProjectReports();
-      }
+      // }
     },
     to(newTo) {
-      if (this.projectId && this.selectedPeriod === "custom") {
+      if (this.selectedPeriod === "custom") {
         this.fetchProjectReports();
       }
     },
@@ -115,6 +116,7 @@ export default {
     this.taskStore.getInfo();
     this.reportStore.computeDates();
     console.log(this.reportStore.from, " ", this.reportStore.to);
+    // this.fetchProjectReports();
   },
 
   computed: {
@@ -134,7 +136,8 @@ export default {
     <h1 class="title m3">Проекты и отчёты по ним</h1>
 
     <select class="select m1" v-model="this.projectId">
-      <option disabled value="">Выберите проект</option>
+      <option disabled value=null>Выберите проект</option>
+      <option value="">Все проекты</option>
       <option
         v-for="project in this.taskStore.filteredProjects"
         :key="project.id"

@@ -65,7 +65,6 @@ class Report {
       const start_date = timestampToMySQLDate(updates.start_date);
       const end_date = timestampToMySQLDate(updates.end_date);
 
-      
       await connection.beginTransaction();
 
       // check user
@@ -82,13 +81,18 @@ class Report {
       }
 
       // handle services
-      await connection.execute(`DELETE FROM report_services where report_id = ?`, [id]); 
+      await connection.execute(
+        `DELETE FROM report_services where report_id = ?`,
+        [id]
+      );
 
       for (const service_id of service_id_array) {
-        await connection.execute(`insert into report_services (report_id, service_id)
-      values(?,?) `, [id, service_id]);
+        await connection.execute(
+          `insert into report_services (report_id, service_id)
+      values(?,?) `,
+          [id, service_id]
+        );
       }
-
 
       // update report
       const values = [
@@ -102,7 +106,7 @@ class Report {
         plans,
         how_good_are_you,
         hanging,
-        id
+        id,
       ];
       const [result] = await connection.execute(
         `
@@ -112,7 +116,55 @@ class Report {
         `,
         values
       );
-      console.log('result', result);
+      console.log("result", result);
+
+      await connection.commit();
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
+  }
+
+  static async deleteReport(id, user_id) {
+    const connection = await pool.getConnection();
+    try {
+      await connection.beginTransaction();
+
+      // check user
+      const [checkRows] = await connection.execute(
+        "SELECT id FROM reports WHERE id = ? AND user_id = ?",
+        [id, user_id]
+      );
+
+      if (checkRows.length === 0) {
+        await connection.rollback();
+        throw new Error(
+          "Не найден отчёт или же пользователь не имеет прав изменять данный отчёт"
+        );
+      }
+      console.log("report id", id);
+
+
+      // delete services of reports
+      const [result] = await connection.execute(
+        `DELETE FROM report_services where report_id = ?`,
+        [id]
+      );
+      if (result.affectedRows < 1) {
+        throw new Error('Что-то не так. Удаление услуг не отработало корректно')
+      }
+
+      // delete report
+      const [deleteReportResult] = await connection.execute(
+        `delete FROM reports where id = ?`,
+        [id]
+      )
+
+      if (deleteReportResult.affectedRows != 1) {
+        throw new Error(`затронуты более 1 или 0 строк ${deleteReportResult}`);
+      }
 
       await connection.commit();
     } catch (error) {
@@ -122,52 +174,7 @@ class Report {
       connection.release();
     }
 
-    /*
-    
-
-      const allowedFields = ['report_description', 'what_get', 'conclusions', 'links', 'plans', 'how_good_are_you', 'hanging', 'project_id'];
-      const fieldsToUpdate = [];
-      const values = [];
-
-      for (const field of allowedFields) {
-        if (updates.hasOwnProperty(field)) {
-          fieldsToUpdate.push(`${field} = ?`);
-          values.push(updates[field]);
-        }
-      }
-
-      if (fieldsToUpdate.length === 0) {
-        throw new Error('No fields to update');
-      }
-
-      // Добавляем updated_at
-      fieldsToUpdate.push('updated_at = NOW()');
-
-      const updateSql = `UPDATE reports SET ${fieldsToUpdate.join(', ')} WHERE id = ?`;
-      await connection.execute(updateSql, [...values, reportId]);
-
-      if (updates.service_id_array && Array.isArray(updates.service_id_array)) {
-        // Удаляем старые связи
-        await connection.execute('DELETE FROM report_services WHERE report_id = ?', [reportId]);
-        
-        // Добавляем новые
-        for (const serviceId of updates.service_id_array) {
-          await connection.execute(
-            'INSERT INTO report_services (report_id, service_id) VALUES (?, ?)',
-            [reportId, serviceId]
-          );
-        }
-      }
-
-      await connection.commit();
-      return true;
-
-
-      // await connection.rollback();
-
-      // connection.release();
-
-    */
+    console.log("delete Report");
   }
 
   static async getReports(filters) {

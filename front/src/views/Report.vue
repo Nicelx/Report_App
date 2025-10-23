@@ -11,7 +11,8 @@ export default {
       message: "",
       projectId: "",
       from: "",
-      to: '',
+      to: "",
+      deleteConfirm : false,
     };
   },
   components: {
@@ -26,12 +27,21 @@ export default {
     toReadable() {
       return timestampToDate(this.reportStore.to);
     },
+
+    deleteBtnText() {
+      const text = this.deleteConfirm ? 'Вы уверены??' : 'Удалить'
+      return text;
+    }
   },
   methods: {
-    
-    // resetFields() {
-    //   this.reportStore.isTouched = false;
-    // },
+    onDelete() {
+      if (this.deleteConfirm) {
+        this.reportStore.deleteReport();
+        this.deleteConfirm = false;
+      } else {
+        this.deleteConfirm = true;
+      }
+    }
   },
   mounted() {
     (async () => {
@@ -40,13 +50,13 @@ export default {
       this.reportStore.findTasksInRange();
     })();
   },
-  
+
   watch: {
     projectId(newVal, oldVal) {
-      if (this.reportStore.editMode == 'edit') {
+      if (this.reportStore.editMode == "edit") {
         this.reportStore.report.projectId = newVal;
-        return 
-      };  
+        return;
+      }
       //  console.log("watch triggered", newVal, oldVal);
       if (newVal && newVal !== oldVal) {
         this.reportStore.fillReport(newVal);
@@ -65,16 +75,10 @@ export default {
       {{ toReadable }}
     </p>
     <div class="m2 row">
-      <button
-        @click="this.reportStore.previousWeek()"
-        class="btn btn-accent"
-      >
+      <button @click="this.reportStore.previousWeek()" class="btn btn-accent">
         Предыдущая неделя
       </button>
-      <button
-        @click="this.reportStore.nextWeek()"
-        class="btn btn-accent"
-      >
+      <button @click="this.reportStore.nextWeek()" class="btn btn-accent">
         Следующая неделя
       </button>
       <!-- <button
@@ -89,7 +93,10 @@ export default {
     <div class="m2">
       Найдены задачи по следующим проектам за выбранный период:
       <p v-for="project in this.reportStore.projectsInRange">
-        - <span class = "link" v-on:click="this.projectId = project">{{ this.taskStore.projectMap[project] }}</span>
+        -
+        <span class="link" v-on:click="this.projectId = project">{{
+          this.taskStore.projectMap[project]
+        }}</span>
       </p>
     </div>
     <div>
@@ -117,16 +124,35 @@ export default {
     >
       {{ this.reportStore.statusMessage }}
     </p>
-    <div class = "row">
-      <button v-if="this.reportStore.editMode == 'add'" class="btn btn-accent" @click="this.reportStore.sendReport">
+    <div class="row m2">
+      <button
+        v-if="this.reportStore.editMode == 'add'"
+        class="btn btn-accent"
+        @click="this.reportStore.sendReport"
+      >
         Send Report
       </button>
-      <button v-if="this.reportStore.editMode == 'edit'" class="btn btn-secondary" @click="this.reportStore.updateReport">
+      <button
+        v-if="this.reportStore.editMode == 'edit'"
+        class="btn btn-secondary"
+        @click="this.reportStore.updateReport"
+      >
         Обновить отчёт
       </button>
-      <button v-if="this.reportStore.editMode == 'edit'" class="btn btn-primary" @click="this.reportStore.toggleEdit">
+      <button
+        v-if="this.reportStore.editMode == 'edit'"
+        class="btn btn-primary"
+        @click="this.reportStore.setAdd"
+      >
         Отменить редактирование
       </button>
     </div>
+    <button
+      v-if="this.reportStore.editMode == 'edit'"
+      class="btn btn-secondary"
+      @click="onDelete"
+    >
+      {{ deleteBtnText }}
+    </button>
   </div>
 </template>

@@ -78,6 +78,26 @@ exports.updateReport = async (req, res) => {
   }
 };
 
+exports.deleteReport = async (req, res) => {
+  try {
+    const {id : user_id} = req.user;
+    const {id} = req.params;
+    if (!user_id || !id) {
+      throw new Error('user_id или id не определены')
+    }
+    await Report.deleteReport(id, user_id);
+    
+    return res.send({
+      message: "report deleted",
+    });
+    
+  } catch (error) {
+      return res.status(500).json({
+      message: error.message,
+    });
+  }
+}
+
 const validateDates = (start_date, end_date) => {
   if (
     !start_date ||

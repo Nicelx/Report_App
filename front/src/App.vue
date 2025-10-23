@@ -1,12 +1,16 @@
 <script>
+import { useAuthStore } from "@/stores/authStore";
+import { mapStores } from "pinia";
+
 export default {
   methods: {
     logout() {
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("user");
+      this.authStore.logout();
       this.$router.push("/login");
     },
+  },
+  computed: {
+    ...mapStores(useAuthStore),
   },
 };
 </script>
@@ -16,7 +20,7 @@ export default {
     <router-link to="/">Tasks</router-link>
     <router-link to="/report">Send Report</router-link>
     <router-link to="/projects">Projects</router-link>
-    <router-link to="/login">Login</router-link>
+    <router-link v-if="!authStore.isAuthenticated" to="/login">Login</router-link>
     <router-link to="/register">Register</router-link>
     <router-link to="/settings">Settings</router-link>
     <a href="#" @click.prevent="logout">Log out</a>
