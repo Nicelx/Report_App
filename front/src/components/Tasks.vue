@@ -40,7 +40,6 @@ export default {
       });
     },
     filteredTasks() {
-      // console.log('pf', this.projectFilter);
       if (this.projectFilter == 0) return this.sortedTasks;
       return [...this.sortedTasks].filter(item => {
         return item.project_id == this.projectFilter;

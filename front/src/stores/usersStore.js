@@ -5,6 +5,7 @@ import { fetchWithAuth } from "@/utils/api";
 
 export const useUsersStore = defineStore("users", {
   state: () => ({
+    isAuthenticated: !!localStorage.getItem("authToken"),
     currentUser: {},
     users: [],
     selectedServices: [],
@@ -12,6 +13,23 @@ export const useUsersStore = defineStore("users", {
   }),
 
   actions: {
+    login(tokens, userData) {
+      localStorage.setItem("authToken", tokens.accessToken);
+      localStorage.setItem("refreshToken", tokens.refreshToken);
+      localStorage.setItem("user", JSON.stringify(userData));
+
+      this.isAuthenticated = true;
+      this.setCurrentUser()
+    },
+    logout() {
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("user");
+
+      this.isAuthenticated = false;
+      this.currentUser = null;
+    },
+    
     getUser(id) {
       return this.users.find((user) => {
         return user.id == id;

@@ -3,7 +3,12 @@ import { mapStores } from "pinia";
 
 import Tasks from "@/components/Tasks.vue";
 
-import { useTaskStore, useControlsStore, useCoordinatorStore, useUsersStore } from "@/stores";
+import {
+  useTaskStore,
+  useControlsStore,
+  useCoordinatorStore,
+  useUsersStore,
+} from "@/stores";
 
 export default {
   data() {
@@ -16,7 +21,12 @@ export default {
   },
 
   computed: {
-    ...mapStores(useTaskStore, useControlsStore, useCoordinatorStore, useUsersStore),
+    ...mapStores(
+      useTaskStore,
+      useControlsStore,
+      useCoordinatorStore,
+      useUsersStore
+    ),
 
     addNewText() {
       if (this.controlsStore.isControlsOpen) {
@@ -24,6 +34,22 @@ export default {
       } else {
         return "Add new task report";
       }
+    },
+    isExtraService() {
+      return (
+        this.controlsStore.selectedService &&
+        !this.taskStore.filteredServices.find(
+          (s) => s.id === this.controlsStore.selectedService
+        )
+      );
+    },
+    isExtraProject() {
+      return (
+        this.controlsStore.selectedProject &&
+        !this.taskStore.filteredProjects.find(
+          (s) => s.id === this.controlsStore.selectedService
+        )
+      );
     },
   },
   methods: {},
@@ -71,6 +97,13 @@ export default {
         >
           {{ project.name }}
         </option>
+        <option
+          v-if="isExtraProject"
+          :value="this.controlsStore.selectedProject"
+        >
+          {{ this.taskStore.projectMap[this.controlsStore.selectedProject] }}
+          (Проект скрыт в настройках)
+        </option>
       </select>
 
       <select class="select m1" v-model="this.controlsStore.selectedService">
@@ -81,6 +114,13 @@ export default {
           :value="service.id"
         >
           {{ service.name }}
+        </option>
+        <option
+          v-if="isExtraService"
+          :value="this.controlsStore.selectedService"
+        >
+          {{ this.taskStore.servicesMap[this.controlsStore.selectedService] }}
+          (Услуга скрыта в настройках)
         </option>
       </select>
 

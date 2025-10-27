@@ -122,8 +122,6 @@ const validateReport = (report) => {
     projectId,
   } = report;
 
-  console.log(report);
-
   if (
     typeof report_description != "string" ||
     typeof how_good_are_you != "string" ||

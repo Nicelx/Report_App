@@ -1,11 +1,8 @@
 const Task = require("../models/Task");
 
 exports.addTask = async (req, res) => {
-  console.log(req.user);
-  const { user_id, task_description, completed_date, project_id, service_id } =
-    req.body;
-    
-  console.log(completed_date);
+  const { task_description, completed_date, project_id, service_id } = req.body;
+  const { id: user_id } = req.user;
 
   if (
     !user_id ||
@@ -40,6 +37,12 @@ exports.addTask = async (req, res) => {
 exports.updateTask = async (req, res) => {
   try {
     const updates = req.body;
+    const { id: user_id } = req.user;
+
+    if (!user_id) {
+      throw new Error('no user_id');
+    }
+    updates.user_id = user_id; 
 
     await Task.updateTask({
       ...updates,
@@ -57,15 +60,38 @@ exports.updateTask = async (req, res) => {
 exports.deleteTask = async (req, res) => {
   try {
     const { id } = req.body;
+    const{id: user_id} = req.user
 
-    await Task.deleteTask(id);
+    if (!id || !user_id) {
+      throw new Error('Ошибка в id или user_id');
+    }
+
+    await Task.deleteTask(id, user_id);
 
     res.send({
       message: "task Deleted",
     });
   } catch (error) {
     res.status(500).json({
-      message : 'удалить не получилось'
-    })
+      message: "удалить не получилось",
+    });
+  }
+};
+
+exports.getTasks = async (req, res) => {
+  try {
+    const {id : user_id} = req.user;
+    if (!user_id) {
+      throw new Error('Нет user_id');
+    }
+
+    const tasks = await Task.getAll(user_id);
+    res.send(tasks);
+  } catch (error) {
+    res
+      .status(500)
+      .json({
+        message: "Получить задачи не получилось, не фартануло, не повезло эх",
+      });
   }
 };

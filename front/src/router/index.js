@@ -4,7 +4,6 @@ import Login from "../views/Login.vue";
 import Register from "../views/Register.vue";
 import Report from "@/views/Report.vue";
 import Projects from "@/views/Projects.vue";
-import { isAuthenticated } from "@/utils/auth";
 
 import { createRouter, createWebHistory } from "vue-router";
 
@@ -53,7 +52,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const isAuth = isAuthenticated();
+  const isAuth = !!localStorage.getItem('authToken');
 
   if (to.matched.some((record) => record.meta.requiresAuth) && !isAuth) {
     next({

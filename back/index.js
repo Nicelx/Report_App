@@ -5,8 +5,8 @@ const authMiddleware = require('./middleware/auth');
 
 const { createUser, updateUser } = require("./controllers/userController");
 const { login, refresh } = require("./controllers/authController");
-const {addTask, updateTask,deleteTask} = require('./controllers/taskController');
-const { getInfo, getTasks } = require("./controllers/infoController");
+const {addTask, updateTask,deleteTask, getTasks} = require('./controllers/taskController');
+const { getInfo } = require("./controllers/infoController");
 const { addReport, getReports,updateReport, deleteReport } = require("./controllers/reportController");
 
 const app = express();

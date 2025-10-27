@@ -19,7 +19,7 @@ export default {
       message: "",
       projectId: null,
       selectedPeriod: "",
-      selectedUser: "",
+      selectedUser: null,
       from: "",
       to: "",
       customFrom: "",
@@ -58,7 +58,7 @@ export default {
     onUserChange() {
       // console.log("onUserChange()");
       // if (this.projectId) {
-        this.fetchProjectReports();
+      this.fetchProjectReports();
       // }
     },
     fetchProjectReports() {
@@ -88,12 +88,12 @@ export default {
   watch: {
     projectId(newProjectId) {
       // if (newProjectId) {
-        this.fetchProjectReports();
+      this.fetchProjectReports();
       // }
     },
     from(newFrom) {
       // if (this.projectId) {
-        this.fetchProjectReports();
+      this.fetchProjectReports();
       // }
     },
     to(newTo) {
@@ -136,7 +136,7 @@ export default {
     <h1 class="title m3">Проекты и отчёты по ним</h1>
 
     <select class="select m1" v-model="this.projectId">
-      <option disabled value=null>Выберите проект</option>
+      <option disabled value="null">Выберите проект</option>
       <option value="">Все проекты</option>
       <option
         v-for="project in this.taskStore.filteredProjects"
@@ -164,7 +164,7 @@ export default {
     <p v-if="message">{{ message }}</p>
 
     <select class="select m1" v-model="selectedUser" @change="onUserChange">
-      <option disabled value="">Пользователи</option>
+      <option disabled value="null">Пользователи</option>
       <option value="">Все</option>
       <option
         v-for="user in this.usersStore.users"
@@ -175,9 +175,6 @@ export default {
       </option>
     </select>
 
-    <!-- <button class="btn btn-accent m2" @click="fetchProjectReports">
-      fetch
-    </button> -->
     <ReportCard
       v-for="report in this.reportStore.loadedReports"
       :key="report.id"

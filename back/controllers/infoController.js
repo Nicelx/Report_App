@@ -15,6 +15,7 @@ exports.getInfo = async (req, res) => {
   if (!projects || !services) {
     return res.status(500).json({message: 'projects или services не найдены в бд'})
   }
+  
   data.projects = projects;
   data.services = services;
   data.tasks = tasks;
@@ -22,14 +23,3 @@ exports.getInfo = async (req, res) => {
 
   res.send(data);
 };
-
-exports.getTasks = async (req, res) => {
-  try {
-    const tasks = await Task.getAll(req.user.id);
-    res.send(tasks);
-  } catch (error) {
-    res.status(500).json({message: 'Получить задачи не получилось, не фартануло, не повезло эх'})
-  }
-
-
-}

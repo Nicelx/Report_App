@@ -1,5 +1,5 @@
 <script>
-import { useAuthStore } from "@/stores/authStore";
+import { useUsersStore } from "@/stores/usersStore";
 import { mapStores } from "pinia";
 
 export default {
@@ -11,7 +11,7 @@ export default {
     };
   },
   computed: {
-    ...mapStores(useAuthStore),
+    ...mapStores(useUsersStore),
   },
   methods: {
     async login() {
@@ -29,7 +29,7 @@ export default {
       if (response.ok) {
         const data = await response.json();
 
-        this.authStore.login(
+        this.usersStore.login(
           {
             accessToken: data.accessToken,
             refreshToken: data.refreshToken,
@@ -44,7 +44,7 @@ export default {
     },
   },
   mounted() {
-    if (this.authStore.isAuthenticated) {
+    if (this.usersStore.isAuthenticated) {
       this.$router.push("/");
     }
   },

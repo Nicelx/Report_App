@@ -26,6 +26,7 @@ class Task {
     completed_date,
     project_id,
     service_id,
+    user_id
   }) {
     try {
       if (id === undefined) {
@@ -35,7 +36,7 @@ class Task {
       const sql = `
       UPDATE tasks 
        SET task_description = ?, completed_date = ?, project_id = ?, service_id = ?
-       WHERE id = ?`;
+       WHERE id = ? AND user_id = ?`;
 
       const [result] = await pool.execute(sql, [
         task_description,
@@ -43,19 +44,17 @@ class Task {
         project_id,
         service_id,
         id,
+        user_id
       ]);
     } catch (error) {
       throw new Error(error);
     }
   }
-  static async deleteTask(taskId) {
-    if (!taskId) {
-      throw new Error("task id - false");
-    }
-
-    const [result] = await pool.execute("DELETE FROM tasks WHERE id = ?", [
-      taskId,
+  static async deleteTask(taskId, user_id) {
+    const [result] = await pool.execute("DELETE FROM tasks WHERE id = ? AND user_id = ?", [
+      taskId, user_id
     ]);
+    console.log(result);
   }
 
   static async getAll(user_id) {
