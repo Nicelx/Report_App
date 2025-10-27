@@ -154,12 +154,15 @@ export const useReportStore = defineStore("report", {
       const data = await response.json();
       this.loadedReports = [...data.result];
     },
+
     setEdit() {
       this.editMode = "edit";
     },
+
     setAdd() {
       this.editMode = "add";
     },
+
     resetReport() {
       this.report = {
         report_description: "",
@@ -246,14 +249,17 @@ export const useReportStore = defineStore("report", {
       this.from = from;
       this.to = to;
     },
+
     previousWeek() {
       this.timeIndex--;
       this.changeWeekHandler();
     },
+
     nextWeek() {
       this.timeIndex++;
       this.changeWeekHandler();
     },
+    
     changeWeekHandler() {
       this.dynamicNow = new Date(
         this.now.getTime() + FULL_WEEK_MS * this.timeIndex

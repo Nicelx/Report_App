@@ -47,7 +47,7 @@ export default {
       return (
         this.controlsStore.selectedProject &&
         !this.taskStore.filteredProjects.find(
-          (s) => s.id === this.controlsStore.selectedService
+          (s) => s.id === this.controlsStore.selectedProject
         )
       );
     },
@@ -98,7 +98,7 @@ export default {
           {{ project.name }}
         </option>
         <option
-          v-if="isExtraProject"
+        v-if="isExtraProject"
           :value="this.controlsStore.selectedProject"
         >
           {{ this.taskStore.projectMap[this.controlsStore.selectedProject] }}

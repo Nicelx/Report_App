@@ -38,13 +38,15 @@ exports.updateTask = async (req, res) => {
   try {
     const updates = req.body;
     const { id: user_id } = req.user;
+    const {id} = req.params;
 
     if (!user_id) {
       throw new Error('no user_id');
     }
-    updates.user_id = user_id; 
 
     await Task.updateTask({
+      id,
+      user_id,
       ...updates,
     });
 
@@ -59,11 +61,11 @@ exports.updateTask = async (req, res) => {
 };
 exports.deleteTask = async (req, res) => {
   try {
-    const { id } = req.body;
-    const{id: user_id} = req.user
+    const{id: user_id} = req.user;
+    const {id }= req.params
 
-    if (!id || !user_id) {
-      throw new Error('Ошибка в id или user_id');
+    if (!user_id) {
+      throw new Error('Нет user id');
     }
 
     await Task.deleteTask(id, user_id);

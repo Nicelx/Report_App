@@ -177,7 +177,8 @@ class Report {
     console.log("delete Report");
   }
 
-  static async getReports(filters) {
+  static async getReports(filters, requestUserId) {
+    
     const conditions = [];
     const values = [];
 
@@ -218,8 +219,7 @@ class Report {
     ORDER BY reports.start_date DESC, reports.updated_at DESC;
   `;
 
-    // console.log("SQL", sql);
-
+    
     const [result] = await pool.execute(sql, values);
     return result;
   }

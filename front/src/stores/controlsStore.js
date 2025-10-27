@@ -45,6 +45,7 @@ export const useControlsStore = defineStore("controls", {
       this.isControlsOpen = false;
       this.mode = 'create';
       this.editId = null;
+      this.resetFields();
     },
     resetFields() {
       this.taskDescription = "";

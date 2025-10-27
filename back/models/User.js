@@ -7,18 +7,19 @@ class User {
       const hashedPassword = await bcrypt.hash(password, 12);
 
       const [result] = await pool.execute(
-        "INSERT INTO users (username,  password) VALUES (?, ?)",
+        "INSERT INTO users (username,  password, role) VALUES (?, ?, 'user')",
         [username, hashedPassword]
       );
       if (result) return result.insertId;
     } catch (error) {
       console.error("create method catch error");
+      throw error;
     }
   }
 
   static async getAll() {
     const [rows] = await pool.query(
-      "SELECT id, username, fullname, email FROM users"
+      "SELECT id, username, fullname, email, role FROM users"
     );
     return rows;
   }
@@ -30,7 +31,9 @@ class User {
         [username]
       );
       return users[0];
-    } catch (error) {}
+    } catch (error) {
+      throw error;
+    }
   }
 
   static async comparePasswords(candidatePassword, hashedPassword) {

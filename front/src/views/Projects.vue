@@ -163,7 +163,7 @@ export default {
 
     <p v-if="message">{{ message }}</p>
 
-    <select class="select m1" v-model="selectedUser" @change="onUserChange">
+    <select class="select m1" v-model="selectedUser" @change="onUserChange" v-if="usersStore.currentUser.role === 'admin'">
       <option disabled value="null">Пользователи</option>
       <option value="">Все</option>
       <option

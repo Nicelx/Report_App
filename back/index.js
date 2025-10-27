@@ -17,6 +17,8 @@ app.use(express.json());
 
 
 app.get("/get-info", authMiddleware , getInfo);
+
+app.post("/add-task", authMiddleware, addTask);
 app.get("/get-tasks", authMiddleware, getTasks);
 app.put("/update-task/:id", authMiddleware, updateTask);
 app.delete('/delete-task/:id', authMiddleware, deleteTask);
@@ -25,8 +27,6 @@ app.post("/login", login);
 app.post("/create-user", createUser);
 app.put('/update-user', authMiddleware, updateUser)
 app.post("/refresh-token", refresh);
-
-app.post("/add-task", authMiddleware, addTask);
 
 app.get("/reports", authMiddleware, getReports);
 app.post("/add-report", authMiddleware, addReport);

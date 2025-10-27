@@ -72,7 +72,6 @@ export const useUsersStore = defineStore("users", {
         {
           method: "PUT",
           body: JSON.stringify({
-            user_id: this.currentUser.id,
             email: this.currentUser.email,
             fullname: this.currentUser.fullname,
           }),

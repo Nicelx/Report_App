@@ -31,14 +31,14 @@ exports.createUser = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   try {
-    if (req.body.user_id != req.user.id) {
-      return res.status(403).json({
-        message: "Запрещено менять чужого пользователя",
-      });
+    const user_id = req.user.id;
+
+    if (!user_id) {
+      throw new Error('no user id!');
     }
 
     await User.updateUser({
-      user_id: req.body.user_id,
+      user_id: user_id,
       email: req.body.email || null,
       fullname: req.body.fullname || null,
     });

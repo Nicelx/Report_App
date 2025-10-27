@@ -51,14 +51,9 @@ export const useTaskStore = defineStore("task", {
     },
 
     async addTask(data) {
-      const { id: user_id } = JSON.parse(localStorage.getItem("user"));
-
       const response = await fetchWithAuth("http://localhost:3000/add-task", {
         method: "POST",
-        body: JSON.stringify({
-          user_id,
-          ...data,
-        }),
+        body: JSON.stringify(data),
       });
 
       await this.updateTasks();
@@ -95,10 +90,7 @@ export const useTaskStore = defineStore("task", {
         `http://localhost:3000/update-task/${taskId}`,
         {
           method: "PUT",
-          body: JSON.stringify({
-            id: taskId,
-            ...taskData,
-          }),
+          body: JSON.stringify(taskData),
         }
       );
 
@@ -106,15 +98,10 @@ export const useTaskStore = defineStore("task", {
     },
 
     async deleteTask(taskId) {
-      // const token = localStorage.getItem("authToken");
-
       const response = await fetchWithAuth(
         `http://localhost:3000/delete-task/${taskId}`,
         {
-          method: "DELETE",
-          body: JSON.stringify({
-            id: taskId,
-          }),
+          method: "DELETE"
         }
       );
 

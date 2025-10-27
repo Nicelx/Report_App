@@ -32,6 +32,12 @@ exports.addReport = async (req, res) => {
 
 exports.getReports = async (req, res) => {
   try {
+    const {id: requestUserId, role} = req.user;
+
+    if (!requestUserId) {
+      throw new Error('no user id');
+    }
+
     const filters = {
       project_id: req.query.project_id || null,
       user_id: req.query.user_id || null,
@@ -39,7 +45,11 @@ exports.getReports = async (req, res) => {
       end_date: req.query.to || null,
     };
 
-    const result = await Report.getReports(filters);
+    if (role == 'user') {
+      filters.user_id = requestUserId;
+    }
+
+    const result = await Report.getReports(filters, requestUserId);
     return res.send({
       result,
       message: "reports/",
