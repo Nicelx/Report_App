@@ -2,6 +2,8 @@ import { getWeekTimeRange, isInRange } from "@/utils/util";
 import { defineStore } from "pinia";
 import { useTaskStore } from "./taskStore";
 import { fetchWithAuth } from "@/utils/api";
+import { useMessageStore } from "./messageStore";
+import router from "@/router";
 
 const FULL_WEEK_MS = 604800000;
 
@@ -16,13 +18,14 @@ export const useReportStore = defineStore("report", {
     from: "",
     to: "",
     timeIndex: 0,
-    statusMessage: "",
     loadedReports: [],
     editMode: "add", // add, edit
   }),
 
   actions: {
     async sendReport() {
+      const message = useMessageStore();
+
       this.validateReport();
 
       if (!this.isDataValid) return;
@@ -37,18 +40,14 @@ export const useReportStore = defineStore("report", {
       });
 
       if (response.status == 200) {
-        this.statusMessage = "Отчёт отправлен";
-
-        setTimeout(() => {
-          this.statusMessage = "";
-          this.isDataValid = false;
-        }, 2000);
-
+        message.success("Отчёт отправлен");
+        this.isDataValid = false;
         this.resetReport();
       }
     },
 
     async updateReport() {
+      const message = useMessageStore();
       const { id } = this.report;
 
       this.validateReport();
@@ -56,7 +55,7 @@ export const useReportStore = defineStore("report", {
       if (!this.isDataValid) return;
 
       if (!id) {
-        this.statusMessage = "Не передан id отчёта для обновления";
+        message.error("Не передан id отчёта для обновления");
         return;
       }
 
@@ -73,36 +72,24 @@ export const useReportStore = defineStore("report", {
       );
 
       if (response.status == 200) {
-        this.statusMessage = "Отчёт отправлен";
-
-        setTimeout(() => {
-          this.statusMessage = "";
-          this.isDataValid = false;
-        }, 2000);
-
+        message.success("Отчёт обновлён");
         this.resetReport();
         this.setAdd();
       }
-      if (response.status == 500) {
-        console.log(response.json().message);
-
-        this.statusMessage = response.json().message;
-        setTimeout(() => {
-          this.statusMessage = "";
-          this.isDataValid = false;
-        }, 2000);
+      if (response.status != 200) {
+        message.error(response.json().message);
       }
+        this.isDataValid = false;
+
     },
 
     async deleteReport() {
+      const message = useMessageStore();
       const { id } = this.report;
 
       if (!id) {
-        this.statusMessage = "Не передан id отчёта для обновления";
-        setTimeout(() => {
-          this.statusMessage = "";
-          this.isDataValid = false;
-        }, 2000);
+        message.error("Не передан id отчёта для удаления");
+        this.isDataValid = false;
         return;
       }
 
@@ -115,23 +102,13 @@ export const useReportStore = defineStore("report", {
 
       if (response.status == 200) {
         this.setAdd();
-        this.statusMessage = "Отчёт удалён=(";
-
-        setTimeout(() => {
-          this.statusMessage = "";
-          this.isDataValid = false;
-          this.$router.push("/projects");
-        }, 2000);
+        message.success("Отчёт удалён=(");
+        router.push("/projects");
       }
-      if (response.status == 500) {
-        const data = await response.json(); 
-        this.statusMessage = data.message;
-
-        setTimeout(() => {
-          this.statusMessage = "";
-          this.isDataValid = false;
-        }, 2000);
+      if (response.status != 200) {
+        message.error(response.json().message);
       }
+      this.isDataValid = false;
     },
 
     async getReports(filter) {
@@ -177,10 +154,11 @@ export const useReportStore = defineStore("report", {
     },
 
     validateReport() {
+      const message = useMessageStore();
       const { how_good_are_you, report_description, service_id_array } =
         this.report;
       if (!this.from || !this.to) {
-        this.statusMessage = "Ошибка периода";
+        message.error("Ошибка временного периода");
         this.isDataValid = false;
         return;
       }
@@ -193,12 +171,12 @@ export const useReportStore = defineStore("report", {
         )
       ) {
         this.isDataValid = false;
-        this.statusMessage = "Не указана оценка";
+        message.error("Не указана оценка");
         return;
       }
 
       if (report_description.length <= 2) {
-        this.statusMessage = "Поле Что сделали не заполнено";
+        message.error("Поле Что сделали не заполнено");
         this.isDataValid = false;
         return;
       }
@@ -207,7 +185,7 @@ export const useReportStore = defineStore("report", {
         typeof service_id_array !== "object" ||
         service_id_array.length == 0
       ) {
-        this.statusMessage = "Не указаны услуги";
+        message.error("Не указаны услуги");
         this.isDataValid = false;
         return;
       }
@@ -259,7 +237,7 @@ export const useReportStore = defineStore("report", {
       this.timeIndex++;
       this.changeWeekHandler();
     },
-    
+
     changeWeekHandler() {
       this.dynamicNow = new Date(
         this.now.getTime() + FULL_WEEK_MS * this.timeIndex

@@ -56,10 +56,7 @@ export default {
       }
     },
     onUserChange() {
-      // console.log("onUserChange()");
-      // if (this.projectId) {
       this.fetchProjectReports();
-      // }
     },
     fetchProjectReports() {
       const filters = {};
@@ -87,14 +84,10 @@ export default {
   },
   watch: {
     projectId(newProjectId) {
-      // if (newProjectId) {
       this.fetchProjectReports();
-      // }
     },
     from(newFrom) {
-      // if (this.projectId) {
       this.fetchProjectReports();
-      // }
     },
     to(newTo) {
       if (this.selectedPeriod === "custom") {

@@ -25,7 +25,7 @@ export default {
     editReport() {
       this.$router.push("/report");
       const service_id_array = this.reportData.service_ids ? this.reportData.service_ids.split(',') : [];
-
+      console.log(this.reportData);
       this.reportStore.report = {
         report_description: this.reportData.report_description,
         hanging: this.reportData.hanging,
@@ -38,6 +38,9 @@ export default {
         id: this.reportData.id,
         projectId: this.reportData.project_id,
       };
+      this.reportStore.from = this.reportData.start_date;
+      console.log(this.reportStore.from, 'from ')
+      this.reportStore.to = 1731512400000;
 
       this.reportStore.setEdit();
 

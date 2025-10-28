@@ -10,17 +10,25 @@ export const useControlsStore = defineStore("controls", {
     selectedProject: "",
     selectedService: "",
     taskDate: new Date().toISOString().slice(0, 10),
-    mode: 'create'
+    mode: "create",
+    message: "",
   }),
   actions: {
     newTask() {
-      if (this.mode == 'edit') {
-        this.mode = 'create';
+      if (this.mode == "edit") {
+        this.mode = "create";
       }
       this.isControlsOpen = !this.isControlsOpen;
       this.editId = null;
     },
     getFormData() {
+      if (!this.taskDescription) {
+        throw new Error('Заполните поле с задачей!')
+      }
+      if (!this.selectedProject || !this.selectedService) {
+        throw new Error('Не все поля выбраны!');
+      }
+
       return {
         task_description: this.taskDescription,
         project_id: this.selectedProject,
@@ -33,7 +41,7 @@ export const useControlsStore = defineStore("controls", {
       const task = taskStore.getTaskById(taskId);
 
       this.isControlsOpen = true;
-      this.mode = 'edit';
+      this.mode = "edit";
       this.editId = taskId;
 
       this.taskDescription = task.task_description;
@@ -43,13 +51,13 @@ export const useControlsStore = defineStore("controls", {
     },
     editClose() {
       this.isControlsOpen = false;
-      this.mode = 'create';
+      this.mode = "create";
       this.editId = null;
       this.resetFields();
     },
     resetFields() {
       this.taskDescription = "";
-      this.taskDate = new Date().toISOString().slice(0, 10)
-    }
+      this.taskDate = new Date().toISOString().slice(0, 10);
+    },
   },
 });

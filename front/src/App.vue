@@ -1,6 +1,7 @@
 <script>
 import { useUsersStore } from "@/stores/usersStore";
 import { mapStores } from "pinia";
+import Messages from "./components/Messages.vue";
 
 export default {
   methods: {
@@ -9,6 +10,9 @@ export default {
       this.$router.push("/login");
     },
   },
+  components: {
+    Messages,
+  },
   computed: {
     ...mapStores(useUsersStore),
   },
@@ -16,12 +20,13 @@ export default {
 </script>
 
 <template>
+  <Messages/>
   <nav class="nav m2">
     <router-link to="/">Tasks</router-link>
     <router-link to="/report">Send Report</router-link>
     <router-link to="/projects">Projects</router-link>
     <router-link v-if="!usersStore.isAuthenticated" to="/login">Login</router-link>
-    <router-link to="/register">Register</router-link>
+    <router-link v-if="usersStore.currentUser.role == 'admin'" to="/register">Register</router-link>
     <router-link to="/settings">Settings</router-link>
     <a href="#" @click.prevent="logout">Log out</a>
   </nav>

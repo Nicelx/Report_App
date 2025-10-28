@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { useUsersStore } from "./usersStore";
+import { useMessageStore } from "./messageStore";
 import { fetchWithAuth } from "@/utils/api";
-
 
 export const useTaskStore = defineStore("task", {
   state: () => ({
@@ -17,8 +17,8 @@ export const useTaskStore = defineStore("task", {
       const users = useUsersStore();
 
       if (users.selectedServices && users.selectedServices.length > 0) {
-        const filteredServices = state.services.filter(service => {
-          return users.selectedServices.includes(service.id)
+        const filteredServices = state.services.filter((service) => {
+          return users.selectedServices.includes(service.id);
         });
 
         return filteredServices;
@@ -30,15 +30,15 @@ export const useTaskStore = defineStore("task", {
       const users = useUsersStore();
 
       if (users.selectedProjects && users.selectedProjects.length > 0) {
-        const filteredProjects = state.projects.filter(project => {
-          return users.selectedProjects.includes(project.id)
+        const filteredProjects = state.projects.filter((project) => {
+          return users.selectedProjects.includes(project.id);
         });
 
         return filteredProjects;
       }
 
       return state.projects;
-    }
+    },
   },
   actions: {
     generateMaps() {
@@ -51,19 +51,31 @@ export const useTaskStore = defineStore("task", {
     },
 
     async addTask(data) {
-      const response = await fetchWithAuth("http://localhost:3000/add-task", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
+      const message = useMessageStore();
+      try {
+        const response = await fetchWithAuth("http://localhost:3000/add-task", {
+          method: "POST",
+          body: JSON.stringify(data),
+        });
 
-      await this.updateTasks();
+        if (response.status === 200) {
+          message.success("Задача успешно добавлена");
+          await this.updateTasks();
+        } else {
+          throw new Error("Не удалось добавить задачу");
+        }
+      } catch (error) {
+        message.error(error.message);
+      }
     },
 
     // init app data
     async getInfo() {
-      const response = await fetchWithAuth("http://localhost:3000/get-info", {method: "GET"})
+      const response = await fetchWithAuth("http://localhost:3000/get-info", {
+        method: "GET",
+      });
 
-      const data = await response.json(); 
+      const data = await response.json();
 
       const users = useUsersStore();
 
@@ -72,7 +84,7 @@ export const useTaskStore = defineStore("task", {
       this.tasks = data.tasks;
       users.users = data.users;
       users.setCurrentUser();
-      this.generateMaps()
+      this.generateMaps();
     },
 
     async updateTasks() {
@@ -86,26 +98,48 @@ export const useTaskStore = defineStore("task", {
     },
 
     async updateTask(taskId, taskData) {
-      const response = await fetchWithAuth(
-        `http://localhost:3000/update-task/${taskId}`,
-        {
-          method: "PUT",
-          body: JSON.stringify(taskData),
-        }
-      );
+      const message = useMessageStore();
 
-      await this.updateTasks();
+      try {
+        const response = await fetchWithAuth(
+          `http://localhost:3000/update-task/${taskId}`,
+          {
+            method: "PUT",
+            body: JSON.stringify(taskData),
+          }
+        );
+
+        if (response.ok) {
+          message.success("Задача обновлена");
+          await this.updateTasks();
+        } else {
+          message.error(response.status);
+        }
+      } catch (error) {
+        message.error("ошибка", error.message);
+      }
     },
 
     async deleteTask(taskId) {
-      const response = await fetchWithAuth(
-        `http://localhost:3000/delete-task/${taskId}`,
-        {
-          method: "DELETE"
-        }
-      );
+      const message = useMessageStore();
+      try {
+        const response = await fetchWithAuth(
+          `http://localhost:3000/delete-task/${taskId}`,
+          {
+            method: "DELETE",
+          }
+        );
 
-      await this.updateTasks();
+        if (response.status == 200) {
+          message.success("Задача удалена");
+        } else {
+          throw new Error('Ошибка ответа сервера!')
+        }
+
+        await this.updateTasks();
+      } catch (error) {
+        message.error(error.message);
+      }
     },
 
     getTaskById(id) {

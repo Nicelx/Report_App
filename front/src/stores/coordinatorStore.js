@@ -1,34 +1,54 @@
 import { defineStore } from "pinia";
 import { useTaskStore } from "./taskStore";
 import { useControlsStore } from "./controlsStore";
+import { useMessageStore } from "./messageStore";
 // import { getDatetime } from "@/utils/util";
 
 export const useCoordinatorStore = defineStore("coordinator", {
   actions: {
     addTask() {
-      const taskStore = useTaskStore();
-      const controls = useControlsStore();
+      const message = useMessageStore();
+      try {
+        const taskStore = useTaskStore();
+        const controls = useControlsStore();
 
-      taskStore.addTask({
-        ...controls.getFormData(),
-      });
-      controls.resetFields();
+        taskStore.addTask({
+          ...controls.getFormData(),
+        });
+        controls.resetFields();
+      } catch (error) {
+        message.error(error.message);
+      }
     },
     updateTask() {
-      const taskStore = useTaskStore();
-      const controls = useControlsStore();
+      const message = useMessageStore();
 
-      taskStore.updateTask(controls.editId, {
-        ...controls.getFormData()
-      })
-      controls.resetFields();
+      try {
+        const taskStore = useTaskStore();
+        const controls = useControlsStore();
+
+        taskStore.updateTask(controls.editId, {
+          ...controls.getFormData(),
+        });
+        controls.resetFields();
+      } catch (error) {
+        message.error(error.message);
+      }
     },
     async deleteTask() {
-      const taskStore = useTaskStore();
-      const controls = useControlsStore();
+      const message = useMessageStore();
 
-      await taskStore.deleteTask(controls.editId);
-      controls.editClose();
-    }
+      try {
+        const taskStore = useTaskStore();
+        const controls = useControlsStore();
+
+        await taskStore.deleteTask(controls.editId);
+
+        controls.editClose();
+        controls.resetFields();
+      } catch (error) {
+        message.error(error.message);
+      }
+    },
   },
 });

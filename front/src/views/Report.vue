@@ -2,7 +2,12 @@
 import { mapStores } from "pinia";
 import { timestampToDate } from "@/utils/util";
 
-import { useTaskStore, useControlsStore, useReportStore } from "@/stores";
+import {
+  useTaskStore,
+  useControlsStore,
+  useReportStore,
+  useMessageStore,
+} from "@/stores";
 import ReportItem from "@/components/ReportItem.vue";
 
 export default {
@@ -12,7 +17,7 @@ export default {
       projectId: "",
       from: "",
       to: "",
-      deleteConfirm : false,
+      deleteConfirm: false,
     };
   },
   components: {
@@ -20,7 +25,12 @@ export default {
   },
 
   computed: {
-    ...mapStores(useTaskStore, useControlsStore, useReportStore),
+    ...mapStores(
+      useTaskStore,
+      useControlsStore,
+      useReportStore,
+      useMessageStore
+    ),
     fromReadable() {
       return timestampToDate(this.reportStore.from);
     },
@@ -29,9 +39,16 @@ export default {
     },
 
     deleteBtnText() {
-      const text = this.deleteConfirm ? 'Вы уверены??' : 'Удалить'
+      const text = this.deleteConfirm ? "Вы уверены??" : "Удалить";
       return text;
-    }
+    },
+    // projectsForOption() {
+    //   if (this.reportStore.editMode =='add') {
+    //     return this.taskStore.filteredProjects
+    //   } else {
+    //     return this.taskStore.projects;
+    //   }
+    // }
   },
   methods: {
     onDelete() {
@@ -41,13 +58,19 @@ export default {
       } else {
         this.deleteConfirm = true;
       }
-    }
+    },
+    fireMessage() {
+      // this.messageStore.success('message text from report view');
+      this.messageStore.error("ошибка блять");
+    },
   },
   mounted() {
     (async () => {
       await this.taskStore.getInfo();
-      this.reportStore.computeDates();
-      this.reportStore.findTasksInRange();
+      if (this.reportStore.editMode == 'add') {
+        this.reportStore.computeDates();
+        this.reportStore.findTasksInRange();
+      } 
     })();
   },
 
@@ -70,6 +93,10 @@ export default {
   <div class="wrapper">
     <h1 class="title m3">Week Report</h1>
 
+    <button @click="fireMessage" class="btn btn-accent">
+      Запустить сообщение!
+    </button>
+
     <p class="title-secondary m2">
       Период с {{ fromReadable }} до
       {{ toReadable }}
@@ -81,13 +108,6 @@ export default {
       <button @click="this.reportStore.nextWeek()" class="btn btn-accent">
         Следующая неделя
       </button>
-      <!-- <button
-        class="btn btn-accent"
-        @click="resetFields()"
-        v-if="this.reportStore.isTouched"
-      >
-        Reset Report
-      </button> -->
     </div>
 
     <div class="m2">
@@ -100,7 +120,6 @@ export default {
       </p>
     </div>
     <div>
-      Выберите проект:
       <select class="select m2" v-model="this.projectId">
         <option disabled value="">Choose project</option>
         <option

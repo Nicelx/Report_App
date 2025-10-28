@@ -98,7 +98,7 @@ export default {
           {{ project.name }}
         </option>
         <option
-        v-if="isExtraProject"
+          v-if="isExtraProject"
           :value="this.controlsStore.selectedProject"
         >
           {{ this.taskStore.projectMap[this.controlsStore.selectedProject] }}
@@ -154,6 +154,9 @@ export default {
           Delete
         </button>
       </div>
+      <p style="color: red; font-size: 20px">
+        {{ this.controlsStore.message }}
+      </p>
     </div>
 
     <Tasks :tasks="this.taskStore.tasks" :projects="this.taskStore.projects" />
